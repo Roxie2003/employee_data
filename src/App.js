@@ -17,23 +17,7 @@ function App() {
     let mainURL = `https://employee-data-api.vercel.app/api/employees`;
     let mainData = await fetch(mainURL);
     let mainParsedData = await mainData.json();
-    setAllEmployeesData(
-      await Promise.all(
-        mainParsedData["results"] &&
-          mainParsedData["results"].map(async (employee) => {
-            return await getEmployeeData(employee.url);
-          })
-      )
-    );
-  };
-
-  const getEmployeeData = async (employeeURL) => {
-    let employeeInformation = await (await fetch(employeeURL)).json();
-    const employeeInfo = {
-      id: employeeInformation.id,
-      name: employeeInformation.employee_name,
-    };
-    return employeeInfo;
+    setAllEmployeesData(mainParsedData["results"]);
   };
 
   useEffect(() => {
@@ -94,14 +78,14 @@ function App() {
           </div>
         </div>
         <div className="m-5 p-5">
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12 m-5 px-5">
             {filteredEmployees &&
               filteredEmployees.map((employee) => {
                 return (
                   <Card
                     key={employee.id}
                     employeeInfo={employee}
-                    selectCard={toggleModel}
+                    toggleModel={toggleModel}
                   ></Card>
                 );
               })}
