@@ -38,7 +38,7 @@ const Invoice = ({ employeeInfo, selectedMonthYear }) => {
                         </p>
                         <div className='flex justify-between px-16'>
                             <a href="https://weoto.in/" className='text-blue-400 underline'>https://weoto.in/</a>
-                            <span>+91-{employeeInfo.contactNo}</span>
+                            <span>+91-8329587681</span>
                             <a href="mailto:contact@weoto.in" className='text-blue-400 underline'>contact@weoto.in</a>
                         </div>
                         <div className='font-bold'>
