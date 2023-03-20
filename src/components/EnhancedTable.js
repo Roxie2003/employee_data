@@ -22,6 +22,9 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
+import { AiFillEdit } from 'react-icons/ai';
+import { IoMdCreate } from 'react-icons/io';
+import { MdDeleteForever } from 'react-icons/md';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -212,61 +215,33 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [allEmployee, setAllEmployee] = useState({});
+  const [allEmployee, setAllEmployee] = useState([]);
 
 useEffect(() => {
   async function fetchData() {
     let URL = `http://localhost:8000/api/employees/`;
     let data = await fetch(URL);
     let parsedData = await data.json();
-    console.log(parsedData);
-    setAllEmployee(parsedData);
+    setAllEmployee(parsedData.data);
   }
   fetchData();
-  // console.log(allEmployee);
-
 //eslint-disable-next-line
-}, [allEmployee]);
+}, []);
 
-function createData(name, base_salary, designation, location, date_of_joining) {
+function createData(name, base_salary, designation, location, date_of_joining, actionObject) {
   return {
     name,
     base_salary,
     designation,
     location,
     date_of_joining,
+    actionObject
   };
 }
 
-const rows = [
-  createData(allEmployee[0], 5000, "Developer", "Nashik", "18-03-2023"),
-  createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Kapil Mundada', 5000, "Developer", "Nashik", "18-03-2023"),
-  // createData('Donut', 452, 25.0, 51, 4.9),
-  // createData('Eclair', 262, 16.0, 24, 6.0),
-  // createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  // createData('Gingerbread', 356, 16.0, 49, 3.9),
-  // createData('Honeycomb', 408, 3.2, 87, 6.5),
-  // createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  // createData('Jelly Bean', 375, 0.0, 94, 0.0),
-  // createData('KitKat', 518, 26.0, 65, 7.0),
-  // createData('Lollipop', 392, 0.2, 98, 0.0),
-  // createData('Marshmallow', 318, 0, 81, 2.0),
-  // createData('Nougat', 360, 19.0, 9, 37.0),
-  // createData('Oreo', 437, 18.0, 63, 4.0),
-];
+const rows = allEmployee.map((item)=>{
+  return createData(item.name, item.base_salary, item.designation, item.location, item.date_of_joining, item)
+})
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -378,7 +353,13 @@ const rows = [
                       <TableCell >{row.designation}</TableCell>
                       <TableCell >{row.location}</TableCell>
                       <TableCell >{row.date_of_joining}</TableCell>
-                      <TableCell >{row.date_of_joining}</TableCell>
+                      <TableCell >
+                        <div className='flex space-x-4 text-xl'>
+                          <AiFillEdit onClick={console.log(row.actionObject)} className='cursor-pointer' />
+                          <IoMdCreate className='cursor-pointer' />
+                          <MdDeleteForever className='cursor-pointer' />
+                        </div>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
