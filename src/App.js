@@ -1,73 +1,168 @@
-import { useState, useEffect } from "react";
-import { BsSearch } from "react-icons/bs";
-import Card from "./components/Card";
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
+import Container from '@mui/material/Container';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
+import MenuItem from '@mui/material/MenuItem';
+import AdbIcon from '@mui/icons-material/Adb';
+import EnhancedTable from './components/EnhancedTable';
+
+const pages = ['Products', 'Pricing', 'Blog'];
+const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function App() {
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [allEmployeesData, setAllEmployeesData] = useState([]);
-  const [searchInput, setSearchInput] = useState("");
 
-  const fetchData = async () => {
-    let mainURL = `https://employee-data-api.vercel.app/api/employees`;
-    let mainData = await fetch(mainURL);
-    let mainParsedData = await mainData.json();
-    setAllEmployeesData(mainParsedData["results"]);
+  const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const handleOpenNavMenu = (event) => {
+    setAnchorElNav(event.currentTarget);
+  };
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
   };
 
-  useEffect(() => {
-    fetchData();
-    //eslint-disable-next-line
-  }, []);
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
 
-  useEffect(() => {
-    setFilteredEmployees(allEmployeesData);
-  }, [allEmployeesData]);
-
-  const handelChange = async (e) => {
-    await setSearchInput(e.target.value);
-    setFilteredEmployees(
-      allEmployeesData.filter((item) =>
-        item.name.toLowerCase().includes(e.target.value.toLowerCase())
-      )
-    );
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
   };
 
   return (
     <>
-      <div>
-        <div className="bg-[#000000] text-white p-3">
-          <div className="p-5">
-            <h1 className="p-2 md:p-4 text-3xl font-semibold"> Employee Data </h1>
-          </div>
-          <div className="flex justify-evenly items-center p-5 space-x-4">
-            <label htmlFor="search" className="md:text-xl">Search</label>
-            <div className="rounded-lg flex items-center  md:w-3/4 space-x-2 pr-3">
-              <input
-                type="search"
-                name="search"
-                id="search"
-                value={searchInput}
-                onChange={handelChange}
-                placeholder="Name"
-                className="bg-[#c9dde2] text-black p-2 md:p-3 rounded-lg w-full"
-              />
-              <BsSearch className="bg-transparent text-black" />
-            </div>
-          </div>
-        </div>
-        <div className="m-5 p-5">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-12 md:m-5 md:px-5">
-            {filteredEmployees &&
-              filteredEmployees.map((employee) => {
-                return (
-                  <Card
-                    key={employee.id}
-                    employeeInfo={employee}
-                  ></Card>
-                );
-              })}
-          </div>
-        </div>
+      <AppBar position="static">
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
+            <img src="./logo.png" alt='logo' className='w-10 mr-4' />
+            <Typography
+              variant="h6"
+              noWrap
+              component="a"
+              href="/"
+              sx={{
+                mr: 2,
+                display: { xs: 'none', md: 'flex' },
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                letterSpacing: '.3rem',
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+            >
+              Payroll Management
+            </Typography>
+
+            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenNavMenu}
+                color="inherit"
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorElNav}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left',
+                }}
+                open={Boolean(anchorElNav)}
+                onClose={handleCloseNavMenu}
+                sx={{
+                  display: { xs: 'block', md: 'none' },
+                }}
+              >
+                {pages.map((page) => (
+                  <MenuItem key={page} onClick={handleCloseNavMenu}>
+                    <Typography textAlign="center">{page}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+            <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+            <Typography
+              variant="h5"
+              noWrap
+              component="a"
+              href=""
+              sx={{
+                mr: 2,
+                display: { xs: 'flex', md: 'none' },
+                flexGrow: 1,
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                letterSpacing: '.3rem',
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+            >
+              LOGO
+            </Typography>
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+              {pages.map((page) => (
+                <Button
+                  key={page}
+                  onClick={handleCloseNavMenu}
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  {page}
+                </Button>
+              ))}
+            </Box>
+
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+      
+      <div className='p-10'>
+        <EnhancedTable />
       </div>
     </>
   );
