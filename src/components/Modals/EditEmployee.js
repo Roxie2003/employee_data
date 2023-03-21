@@ -9,6 +9,23 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 function EditEmployee({ employee, onFieldChange }) {
+  const onBankFieldChange = (e) => {
+    onFieldChange({
+      target: {
+        id: "bank_details",
+        value: { ...employee.bank_details, [e.target.id]: e.target.value },
+      },
+    });
+  };
+
+  const onDateFieldChange = (e) => {
+    onFieldChange({
+      target: {
+        id: "date_of_joining",
+        value: dayjs(e),
+      },
+    });
+  };
   return (
     <Box component="form" noValidate autoComplete="off">
       <h3 className="m-1 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
@@ -70,14 +87,7 @@ function EditEmployee({ employee, onFieldChange }) {
               id="date_of_joining"
               label="Joining Date"
               value={dayjs(employee.date_of_joining)}
-              onChange={(e) => {
-                onFieldChange({
-                  target: {
-                    id: "date_of_joining",
-                    value: dayjs(e),
-                  },
-                });
-              }}
+              onChange={onDateFieldChange}
             />
           </LocalizationProvider>
         </Grid>
@@ -95,33 +105,33 @@ function EditEmployee({ employee, onFieldChange }) {
         <Grid item xs={2} sm={6} md={6}>
           <TextField
             required
-            id="bank.details.acc_no"
+            id="acc_no"
             label="Account No"
             value={employee.bank_details.acc_no}
             variant="standard"
-            onChange={onFieldChange}
+            onChange={onBankFieldChange}
             fullWidth
           />
         </Grid>
         <Grid item xs={2} sm={6} md={6}>
           <TextField
             required
-            id="bank_details.name"
+            id="name"
             label="Bank Name"
             value={employee.bank_details.name}
             variant="standard"
-            onChange={onFieldChange}
+            onChange={onBankFieldChange}
             fullWidth
           />
         </Grid>
         <Grid item xs={2} sm={6} md={6}>
           <TextField
             required
-            id="bank_details.IFSC_code"
+            id="IFSC_code"
             label="IFSC Code"
             value={employee.bank_details.IFSC_code}
             variant="standard"
-            onChange={onFieldChange}
+            onChange={onBankFieldChange}
             fullWidth
           />
         </Grid>
