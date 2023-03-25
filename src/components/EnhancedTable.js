@@ -195,7 +195,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Nutrition
+          Employees
         </Typography>
       )}
 
@@ -234,7 +234,7 @@ export default function EnhancedTable() {
 
   useEffect(() => {
     async function fetchData() {
-       let URL = `https://employee-payroll-api.onrender.com/api/employees`;
+      let URL = `https://employee-payroll-api.onrender.com/api/employees`;
       let data = await fetch(URL);
       let parsedData = await data.json();
       setAllEmployee(parsedData.data);
