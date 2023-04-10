@@ -1,15 +1,17 @@
-import EnhancedTable from './components/EnhancedTable';
-import Navbar from './components/Navbar';
+import EnhancedTable from "./components/EnhancedTable";
+import Navbar from "./components/Navbar";
+import { Home } from "./components/Home";
+import { PaySlip } from "./components/PaySlip";
+import { Routes, Route } from "react-router-dom";
 
 function App() {
-
   return (
     <>
       <Navbar />
-      
-      <div className='p-4 md:p-10'>
-        <EnhancedTable />
-      </div>
+      <Routes>
+        <Route path="/" element={<Home />}></Route>
+        <Route path="/paySlip" element={<PaySlip />}></Route>
+      </Routes>
     </>
   );
 }

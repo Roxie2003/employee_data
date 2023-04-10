@@ -8,7 +8,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import Typography from "@mui/material/Typography";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -58,7 +57,8 @@ export default function CustomizedDialogs(props) {
 
   const handleSaveChanges = () => {
     fetch(
-      "https://employee-payroll-api.onrender.com/api/employees/" + children.props.employee._id,
+      "https://employee-payroll-api.onrender.com/api/employees/" +
+        children.props.employee._id,
       {
         headers: {
           Accept: "application/json",
