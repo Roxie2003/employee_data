@@ -3,24 +3,46 @@ import { useLocation } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 
 import Button from "@mui/material/Button";
+import Invoice from "./Modals/Invoice";
 
 export const PaySlip = () => {
   const location = useLocation();
   const { employee, month_year } = location.state;
 
   const [employeeWithAtt, setEmployeeWithAtt] = useState({});
+  const [salarySlipDetails, setSalarySlipDetails] = useState({});
+  const [showSalarySlip, setShowSalarySlip] = useState(false);
   useEffect(() => {
     console.log(employee);
     console.log(month_year);
-    setEmployeeWithAtt({
-      ...employee,
-      income_tax: 0,
-      attendance: employee["attendance"].filter((att) => {
-        if (att.month_year === month_year) console.log(att);
-        return att.month_year === month_year;
-      })[0],
-    });
+
+    checkIfSalarySlipExists();
   }, []);
+
+  const checkIfSalarySlipExists = async () => {
+    let URL =
+      `https://employee-payroll-api.onrender.com/api/salarySlips/` +
+      employee.id +
+      "/" +
+      month_year +
+      "/";
+    let data = await fetch(URL);
+    let parsedData = await data.json();
+    console.log(await parsedData.data.length);
+    if (parsedData.data.length === 0) {
+      setEmployeeWithAtt({
+        ...employee,
+        income_tax: 0,
+        attendance: employee["attendance"].filter((att) => {
+          if (att.month_year === month_year) console.log(att);
+          return att.month_year === month_year;
+        })[0],
+      });
+    } else {
+      await setSalarySlipDetails(parsedData.data[0]);
+      setShowSalarySlip(true);
+    }
+  };
 
   const onFieldChange = (e) => {
     if (e.target.id.includes("attendance."))
@@ -37,10 +59,10 @@ export const PaySlip = () => {
 
   const handleGenerateSlip = async () => {
     console.log(employeeWithAtt);
-    const { base_salary, id, _id, ...salarySlip } = employeeWithAtt;
+    const { id, _id, ...salarySlip } = employeeWithAtt;
     salarySlip["overtime_pay"] =
       (await salarySlip["attendance"].overtime_hrs) * 500;
-    salarySlip["total_salary"] = await (base_salary +
+    salarySlip["total_salary"] = await (salarySlip["base_salary"] +
       salarySlip["overtime_pay"] -
       salarySlip["income_tax"]);
 
@@ -66,12 +88,20 @@ export const PaySlip = () => {
         return response.json();
       })
       .then(function (data) {
+        console.log("Hii");
         console.log(data);
+        setSalarySlipDetails(salarySlip);
+        setShowSalarySlip(true);
       });
   };
 
   return (
     <div>
+      <div>
+        {showSalarySlip && salarySlipDetails && (
+          <Invoice salarySlipDetails={salarySlipDetails}></Invoice>
+        )}
+      </div>
       {employeeWithAtt["attendance"] && (
         <div align="center">
           <div className="grid grid-cols-2 m-5">
@@ -84,7 +114,7 @@ export const PaySlip = () => {
                   required
                   id="name"
                   label="Name"
-                  value={employee.name}
+                  value={employeeWithAtt.name}
                   variant="standard"
                   //onChange={onFieldChange}
                   fullWidth
@@ -93,7 +123,7 @@ export const PaySlip = () => {
                   required
                   id="designation"
                   label="Designation"
-                  value={employee.designation}
+                  value={employeeWithAtt.designation}
                   variant="standard"
                   //onChange={onFieldChange}
                   fullWidth
@@ -102,7 +132,7 @@ export const PaySlip = () => {
                   required
                   id="location"
                   label="Location"
-                  value={employee.location}
+                  value={employeeWithAtt.location}
                   variant="standard"
                   //onChange={onFieldChange}
                   fullWidth
@@ -111,7 +141,7 @@ export const PaySlip = () => {
                   required
                   id="joining_date"
                   label="Date of Joining"
-                  value={employee.date_of_joining}
+                  value={employeeWithAtt.date_of_joining}
                   variant="standard"
                   //onChange={onFieldChange}
                   fullWidth
@@ -128,7 +158,7 @@ export const PaySlip = () => {
                   required
                   id="acc_no"
                   label="Account No"
-                  value={employee.bank_details.acc_no}
+                  value={employeeWithAtt.bank_details.acc_no}
                   variant="standard"
                   //onChange={onBankFieldChange}
                   fullWidth
@@ -138,7 +168,7 @@ export const PaySlip = () => {
                   required
                   id="name"
                   label="Bank Name"
-                  value={employee.bank_details.name}
+                  value={employeeWithAtt.bank_details.name}
                   variant="standard"
                   //onChange={onBankFieldChange}
                   fullWidth
@@ -148,7 +178,7 @@ export const PaySlip = () => {
                   required
                   id="IFSC_code"
                   label="IFSC Code"
-                  value={employee.bank_details.IFSC_code}
+                  value={employeeWithAtt.bank_details.IFSC_code}
                   variant="standard"
                   //onChange={onBankFieldChange}
                   fullWidth
