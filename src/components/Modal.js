@@ -19,7 +19,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 function BootstrapDialogTitle(props) {
-  const { children, handleClose, ...other } = props;
+  const { children, handleClose } = props;
 
   return (
     <DialogTitle sx={{ m: 0, p: 2 }}>
@@ -87,7 +87,6 @@ export default function CustomizedDialogs(props) {
         aria-labelledby="customized-dialog-title"
         open={showModal}
         fullWidth
-        {...other}
       >
         <BootstrapDialogTitle
           id="customized-dialog-title"

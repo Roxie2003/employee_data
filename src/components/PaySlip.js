@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import TextField from "@mui/material/TextField";
-
+import jsPDF from 'jspdf';
 import Button from "@mui/material/Button";
+import Invoice from "./Invoice";
 
 export const PaySlip = () => {
   const location = useLocation();
+  const reportTemplateRef = useRef(null);
   const { employee, month_year } = location.state;
+
 
   const [employeeWithAtt, setEmployeeWithAtt] = useState({});
   useEffect(() => {
@@ -20,7 +23,7 @@ export const PaySlip = () => {
         return att.month_year === month_year;
       })[0],
     });
-  }, []);
+  }, [employee, month_year]);
 
   const onFieldChange = (e) => {
     if (e.target.id.includes("attendance."))
@@ -35,6 +38,19 @@ export const PaySlip = () => {
       setEmployeeWithAtt({ ...employeeWithAtt, [e.target.id]: e.target.value });
   };
 
+  const generatePDF = () => {
+    const doc = new jsPDF({
+      format: [1024, 974],
+      unit: 'pt',
+    });
+
+    doc.html(reportTemplateRef.current, {
+      async callback(doc) {
+        await doc.save(`Payslip-${employee.name}-${month_year}`);
+      },
+    });
+  }
+
   const handleGenerateSlip = async () => {
     console.log(employeeWithAtt);
     const { base_salary, id, _id, ...salarySlip } = employeeWithAtt;
@@ -48,8 +64,8 @@ export const PaySlip = () => {
     console.log(salarySlip);
     fetch(
       "https://employee-payroll-api.onrender.com/api/salarySlips/" +
-        salarySlip.employee_id +
-        "/",
+      salarySlip.employee_id +
+      "/",
       {
         headers: {
           Accept: "application/json",
@@ -66,7 +82,7 @@ export const PaySlip = () => {
         return response.json();
       })
       .then(function (data) {
-        console.log(data);
+        generatePDF()
       });
   };
 
@@ -203,6 +219,11 @@ export const PaySlip = () => {
           <Button autoFocus variant="contained" onClick={handleGenerateSlip}>
             Generate Salary Slip
           </Button>
+          <div style={{ visibility: "hidden" }}>
+          <div ref={reportTemplateRef}>
+            <Invoice employeeInfo={employee} selectedMonthYear={month_year} />
+          </div>
+          </div>
         </div>
       )}
     </div>
