@@ -22,8 +22,8 @@ import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
+import { GrView } from "react-icons/gr";
 import { AiFillEdit } from "react-icons/ai";
-import { GrDocumentPdf } from "react-icons/gr";
 import { MdDeleteForever } from "react-icons/md";
 import Modal from "./Modal";
 import Month from "./Modals/Month";
@@ -90,7 +90,7 @@ const headCells = [
     id: "date_of_joining",
     numeric: false,
     disablePadding: false,
-    label: "Date of Joining",
+    label: "Salary Slip Mounth",
   },
   {
     id: "action",
@@ -195,7 +195,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Employees
+          Payslip
         </Typography>
       )}
 
@@ -220,7 +220,7 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable() {
+export default function SalarySlipTable() {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
@@ -287,25 +287,25 @@ export default function EnhancedTable() {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
+//   const handleClick = (event, name) => {
+//     const selectedIndex = selected.indexOf(name);
+//     let newSelected = [];
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
+//     if (selectedIndex === -1) {
+//       newSelected = newSelected.concat(selected, name);
+//     } else if (selectedIndex === 0) {
+//       newSelected = newSelected.concat(selected.slice(1));
+//     } else if (selectedIndex === selected.length - 1) {
+//       newSelected = newSelected.concat(selected.slice(0, -1));
+//     } else if (selectedIndex > 0) {
+//       newSelected = newSelected.concat(
+//         selected.slice(0, selectedIndex),
+//         selected.slice(selectedIndex + 1)
+//       );
+//     }
 
-    setSelected(newSelected);
-  };
+//     setSelected(newSelected);
+//   };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -373,7 +373,7 @@ export default function EnhancedTable() {
         />
       )}
 
-      <Box sx={{ width: "100%" }}>
+      <Box sx={{ width: "100%", m:5 }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
           <EnhancedTableToolbar numSelected={selected.length} />
           <TableContainer>
@@ -400,7 +400,7 @@ export default function EnhancedTable() {
                     return (
                       <TableRow
                         hover
-                        //                      onClick={(event) => handleClick(event, row.name)}
+                        //onClick={(event) => handleClick(event, row.name)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
@@ -434,13 +434,15 @@ export default function EnhancedTable() {
                               onClick={() =>
                                 handleEditEmployee(row.actionObject)
                               }
+                              title="Edit Payslip"
                               className="cursor-pointer"
                             />
-                            <GrDocumentPdf
+                            <GrView
                               className="cursor-pointer"
+                              title="View Payslip"
                               onClick={() => handleMonthModal(row.actionObject)}
                             />
-                            <MdDeleteForever className="cursor-pointer" />
+                            <MdDeleteForever className="cursor-pointer" title="Delete Payslip" />
                           </div>
                         </TableCell>
                       </TableRow>

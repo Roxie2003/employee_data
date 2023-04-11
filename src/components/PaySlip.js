@@ -13,10 +13,8 @@ export const PaySlip = () => {
   const [salarySlipDetails, setSalarySlipDetails] = useState({});
   const [showSalarySlip, setShowSalarySlip] = useState(false);
   useEffect(() => {
-    console.log(employee);
-    console.log(month_year);
-
     checkIfSalarySlipExists();
+    // eslint-disable-next-line
   }, []);
 
   const checkIfSalarySlipExists = async () => {
@@ -28,7 +26,6 @@ export const PaySlip = () => {
       "/";
     let data = await fetch(URL);
     let parsedData = await data.json();
-    console.log(await parsedData.data.length);
     if (parsedData.data.length === 0) {
       setEmployeeWithAtt({
         ...employee,
@@ -84,11 +81,9 @@ export const PaySlip = () => {
       }
     )
       .then(function (response) {
-        // console.log(response);
         return response.json();
       })
       .then(function (data) {
-        console.log("Hii");
         console.log(data);
         setSalarySlipDetails(salarySlip);
         setShowSalarySlip(true);
@@ -99,7 +94,7 @@ export const PaySlip = () => {
     <div>
       <div>
         {showSalarySlip && salarySlipDetails && (
-          <Invoice salarySlipDetails={salarySlipDetails}></Invoice>
+          <Invoice salarySlipDetails={salarySlipDetails} />
         )}
       </div>
       {employeeWithAtt["attendance"] && (
