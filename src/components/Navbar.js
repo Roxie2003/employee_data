@@ -13,8 +13,8 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { Link } from "react-router-dom";
 
-const pages = ["Create Employee", "Salary Slips"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const pages = ["Salary Slips"];
+const settings = ["Dashboard"];
 
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -45,7 +45,7 @@ function Navbar() {
               alt="logo"
               className="hidden md:block w-10 md:mr-4"
             />
-            <Link to="/" >
+            <Link to="/">
               <Typography
                 variant="h6"
                 noWrap
@@ -101,7 +101,7 @@ function Navbar() {
               </Menu>
             </Box>
             <img src="./logo.png" alt="logo" className="md:hidden w-8 mr-2" />
-            <Link to="/" >
+            <Link to="/">
               <Typography
                 variant="h5"
                 noWrap
@@ -157,8 +157,10 @@ function Navbar() {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
+                  <MenuItem key={setting} onClick={handleCloseUserMenu} to="/">
+                    <Link to="/">
+                      <Typography textAlign="center">{setting}</Typography>
+                    </Link>
                   </MenuItem>
                 ))}
               </Menu>

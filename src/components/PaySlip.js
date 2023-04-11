@@ -91,7 +91,7 @@ export const PaySlip = () => {
   };
   const navigate = useNavigate();
   return (
-    <div>
+    <div align="center">
       <div>
         {showSalarySlip && salarySlipDetails && (
           <Invoice
@@ -103,9 +103,15 @@ export const PaySlip = () => {
           ></Invoice>
         )}
       </div>
+
       {employeeWithAtt["attendance"] && (
-        <div align="center">
-          <div className="grid grid-cols-2 m-5">
+        <div className="w-5/6 py-5">
+          <h1 className="text-2xl font-bold">
+            {employeeWithAtt.name +
+              " : " +
+              employeeWithAtt["attendance"].month_year}
+          </h1>
+          <div className="grid grid-cols-2 m-5 ">
             <div className="p-3">
               <h3 className="my-2 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
                 Employee Details
@@ -142,7 +148,9 @@ export const PaySlip = () => {
                   required
                   id="joining_date"
                   label="Date of Joining"
-                  value={employeeWithAtt.date_of_joining}
+                  value={new Date(
+                    employeeWithAtt.date_of_joining
+                  ).toUTCString()}
                   variant="standard"
                   //onChange={onFieldChange}
                   fullWidth

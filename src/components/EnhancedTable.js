@@ -342,6 +342,23 @@ export default function EnhancedTable() {
     setOpenMonthModal(!openMonthModal);
   };
 
+  const handleDeleteEmployee = (employeeObj) => {
+    fetch(
+      "https://employee-data-api.onrender.com/api/employees/" + employeeObj._id,
+      {
+        method: "DELETE",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setAllEmployee(
+          allEmployee.filter((emp) => emp._id !== employeeObj._id)
+        );
+      })
+      .catch((error) => console.error(error));
+  };
+
   const closeModal = () => {
     setEmployeeForModal({});
     setOpenEditEmpModal(false);
@@ -427,7 +444,9 @@ export default function EnhancedTable() {
                         <TableCell>{row.base_salary}</TableCell>
                         <TableCell>{row.designation}</TableCell>
                         <TableCell>{row.location}</TableCell>
-                        <TableCell>{row.date_of_joining}</TableCell>
+                        <TableCell>
+                          {new Date(row.date_of_joining).toDateString()}
+                        </TableCell>
                         <TableCell>
                           <div className="flex space-x-4 text-xl">
                             <AiFillEdit
@@ -440,7 +459,16 @@ export default function EnhancedTable() {
                               className="cursor-pointer"
                               onClick={() => handleMonthModal(row.actionObject)}
                             />
-                            <MdDeleteForever className="cursor-pointer" />
+                            <MdDeleteForever
+                              className="cursor-pointer"
+                              onClick={() =>
+                                window.confirm(
+                                  "Do you want to delete this employee?"
+                                ) == true
+                                  ? handleDeleteEmployee(row.actionObject)
+                                  : ""
+                              }
+                            />
                           </div>
                         </TableCell>
                       </TableRow>

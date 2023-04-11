@@ -26,7 +26,7 @@ function Invoice({ salarySlipDetails, handleOnClose }) {
   return (
     <>
       <div className=" modal fade fixed inset-0 overflow-auto overscroll-none bg-slate-900 bg-opacity-80 backdrop-blur-md flex justify-center z-50">
-        <div className="bg-[#FFFFFF] bg-opacity-90 p-4 md:p-10 w-full h-fit max-w-3xl modal-dialog modal-dialog-scrollable relative ">
+        <div className="bg-[#FFFFFF]  p-4 md:p-10 w-full h-fit max-w-3xl modal-dialog modal-dialog-scrollable relative ">
           <button className="absolute right-10">
             <BsXCircle
               onClick={handleOnClose}
@@ -84,7 +84,7 @@ function Invoice({ salarySlipDetails, handleOnClose }) {
                     <tr>
                       <th className="w-[25%]">Date of Joining</th>
                       <td>:</td>
-                      <td>{salarySlipDetails.date_of_joining}</td>
+                      <td>{salarySlipDetails.attendance.month_year}</td>
                     </tr>
                     <tr>
                       <th className="w-[25%]">Bank Details</th>
@@ -145,12 +145,14 @@ function Invoice({ salarySlipDetails, handleOnClose }) {
                         {salarySlipDetails.base_salary}
                       </td>
                       <td className="border-l-2 border-black">TDS</td>
-                      <td className="border-l-2 border-black">0.00</td>
+                      <td className="border-l-2 border-black">
+                        {salarySlipDetails.income_tax}
+                      </td>
                     </tr>
                     <tr className="">
                       <td className="">Overtime</td>
                       <td className="border-l-2 border-black">
-                        {salarySlipDetails.overtime_pay.toFixed(2)}
+                        {salarySlipDetails.overtime_pay}
                       </td>
                       <td className="border-l-2 border-black"></td>
                       <td className="border-l-2 border-black">0.00</td>

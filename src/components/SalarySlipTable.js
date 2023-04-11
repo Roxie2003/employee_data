@@ -14,20 +14,23 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import Checkbox from "@mui/material/Checkbox";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { visuallyHidden } from "@mui/utils";
+
 import { GrView } from "react-icons/gr";
-import { AiFillEdit } from "react-icons/ai";
+
 import { MdDeleteForever } from "react-icons/md";
-import Modal from "./Modal";
-import Month from "./Modals/Month";
-import EditEmployee from "./Modals/EditEmployee";
+
+import Invoice from "./Modals/Invoice";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -65,14 +68,14 @@ const headCells = [
   {
     id: "name",
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: "Employee Name",
   },
   {
-    id: "base_salary",
+    id: "total_salary",
     numeric: false,
     disablePadding: false,
-    label: "Base Salary",
+    label: "Total Salary",
   },
   {
     id: "designation",
@@ -87,10 +90,10 @@ const headCells = [
     label: "Location",
   },
   {
-    id: "date_of_joining",
+    id: "attendance.month_year",
     numeric: false,
     disablePadding: false,
-    label: "Salary Slip Mounth",
+    label: "Salary Slip Month",
   },
   {
     id: "action",
@@ -116,35 +119,14 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              "aria-label": "select all desserts",
-            }}
-          />
-        </TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
-            sortDirection={orderBy === headCell.id ? order : false}
           >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : "asc"}
-              onClick={createSortHandler(headCell.id)}
-            >
+            <TableSortLabel active={orderBy === headCell.id}>
               {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === "desc" ? "sorted descending" : "sorted ascending"}
-                </Box>
-              ) : null}
             </TableSortLabel>
           </TableCell>
         ))}
@@ -154,11 +136,6 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(["asc", "desc"]).isRequired,
-  orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
 };
 
@@ -198,20 +175,6 @@ function EnhancedTableToolbar(props) {
           Payslip
         </Typography>
       )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
     </Toolbar>
   );
 }
@@ -221,20 +184,18 @@ EnhancedTableToolbar.propTypes = {
 };
 
 export default function SalarySlipTable() {
-  const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [allEmployee, setAllEmployee] = useState([]);
-  const [openEditEmpModal, setOpenEditEmpModal] = useState(false);
-  const [openMonthModal, setOpenMonthModal] = useState(false);
+  const [showSalarySlip, setShowSalarySlip] = useState(false);
   const [employeeForModal, setEmployeeForModal] = useState({});
+  const [salarySlipDetails, setSalarySlipDetails] = useState({});
 
   useEffect(() => {
     async function fetchData() {
-      let URL = `https://employee-payroll-api.onrender.com/api/employees`;
+      let URL = `https://employee-data-api.onrender.com/api/salarySlips/`;
       let data = await fetch(URL);
       let parsedData = await data.json();
       setAllEmployee(parsedData.data);
@@ -245,18 +206,18 @@ export default function SalarySlipTable() {
 
   function createData(
     name,
-    base_salary,
+    total_salary,
     designation,
     location,
-    date_of_joining,
+    month_year,
     actionObject
   ) {
     return {
       name,
-      base_salary,
+      total_salary,
       designation,
       location,
-      date_of_joining,
+      attendance: { month_year },
       actionObject,
     };
   }
@@ -264,48 +225,33 @@ export default function SalarySlipTable() {
   const rows = allEmployee.map((item) => {
     return createData(
       item.name,
-      item.base_salary,
+      item.total_salary,
       item.designation,
       item.location,
-      item.date_of_joining,
+      item.attendance.month_year,
       item
     );
   });
 
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
+  //   const handleClick = (event, name) => {
+  //     const selectedIndex = selected.indexOf(name);
+  //     let newSelected = [];
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelected = rows.map((n) => n.name);
-      setSelected(newSelected);
-      return;
-    }
-    setSelected([]);
-  };
+  //     if (selectedIndex === -1) {
+  //       newSelected = newSelected.concat(selected, name);
+  //     } else if (selectedIndex === 0) {
+  //       newSelected = newSelected.concat(selected.slice(1));
+  //     } else if (selectedIndex === selected.length - 1) {
+  //       newSelected = newSelected.concat(selected.slice(0, -1));
+  //     } else if (selectedIndex > 0) {
+  //       newSelected = newSelected.concat(
+  //         selected.slice(0, selectedIndex),
+  //         selected.slice(selectedIndex + 1)
+  //       );
+  //     }
 
-//   const handleClick = (event, name) => {
-//     const selectedIndex = selected.indexOf(name);
-//     let newSelected = [];
-
-//     if (selectedIndex === -1) {
-//       newSelected = newSelected.concat(selected, name);
-//     } else if (selectedIndex === 0) {
-//       newSelected = newSelected.concat(selected.slice(1));
-//     } else if (selectedIndex === selected.length - 1) {
-//       newSelected = newSelected.concat(selected.slice(0, -1));
-//     } else if (selectedIndex > 0) {
-//       newSelected = newSelected.concat(
-//         selected.slice(0, selectedIndex),
-//         selected.slice(selectedIndex + 1)
-//       );
-//     }
-
-//     setSelected(newSelected);
-//   };
+  //     setSelected(newSelected);
+  //   };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -320,161 +266,126 @@ export default function SalarySlipTable() {
     setDense(event.target.checked);
   };
 
-  const isSelected = (name) => selected.indexOf(name) !== -1;
-
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  const handleEmpChange = (e) => {
-    console.log(e);
-    setEmployeeForModal({ ...employeeForModal, [e.target.id]: e.target.value });
-  };
-  const handleEditEmployee = (employeeObj) => {
-    //  console.log(employeeObj);
-    setEmployeeForModal(employeeObj);
-    setOpenEditEmpModal(!openEditEmpModal);
-  };
-
-  const handleMonthModal = (employeeObj) => {
-    // console.log(employeeObj);
-    setEmployeeForModal(employeeObj);
-    setOpenMonthModal(!openMonthModal);
-  };
-
-  const closeModal = () => {
-    setEmployeeForModal({});
-    setOpenEditEmpModal(false);
-    setOpenMonthModal(false);
+  const handleDeleteSalarySlip = (salarySlipId) => {
+    if (window.confirm("Do you want to delete this salary Slip?") === true) {
+      fetch(
+        "https://employee-data-api.onrender.com/api/salarySlips/" +
+          salarySlipId,
+        {
+          method: "DELETE",
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          //window.location.reload(true);
+        })
+        .catch((error) => console.error(error));
+    }
   };
   return (
-    <div>
-      {openMonthModal && (
-        <Modal
-          title="Select Month for Salary"
-          children={<Month employee={employeeForModal} />}
-          onClose={closeModal}
-          showModal={openMonthModal}
-          maxWidth="xs"
-        />
-      )}
-      {openEditEmpModal && (
-        <Modal
-          title="Edit Employee Info"
-          children={
-            <EditEmployee
-              employee={employeeForModal}
-              onFieldChange={handleEmpChange}
-            />
-          }
-          onClose={closeModal}
-          showModal={openEditEmpModal}
-          hasfooter={"true"}
-        />
-      )}
+    <div className="p-4 md:p-10">
+      <div>
+        <div>
+          {showSalarySlip && salarySlipDetails && (
+            <Invoice
+              salarySlipDetails={salarySlipDetails}
+              handleOnClose={() => {
+                setShowSalarySlip(false);
+              }}
+            ></Invoice>
+          )}
+        </div>
 
-      <Box sx={{ width: "100%", m:5 }}>
-        <Paper sx={{ width: "100%", mb: 2 }}>
-          <EnhancedTableToolbar numSelected={selected.length} />
-          <TableContainer>
-            <Table
-              sx={{ minWidth: 750 }}
-              aria-labelledby="tableTitle"
-              size={dense ? "small" : "medium"}
-            >
-              <EnhancedTableHead
-                numSelected={selected.length}
-                order={order}
-                orderBy={orderBy}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={rows.length}
-              />
-              <TableBody>
-                {stableSort(rows, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => {
-                    const isItemSelected = isSelected(row.name);
-                    const labelId = `enhanced-table-checkbox-${index}`;
-
-                    return (
-                      <TableRow
-                        hover
-                        //onClick={(event) => handleClick(event, row.name)}
-                        role="checkbox"
-                        aria-checked={isItemSelected}
-                        tabIndex={-1}
-                        key={row.name}
-                        selected={isItemSelected}
-                      >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              "aria-labelledby": labelId,
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell
-                          component="th"
-                          id={labelId}
-                          scope="row"
-                          padding="none"
+        <Box sx={{ width: "100%" }}>
+          <Paper sx={{ width: "100%", mb: 2 }}>
+            <EnhancedTableToolbar numSelected={selected.length} />
+            <TableContainer>
+              <Table
+                sx={{ minWidth: 750 }}
+                aria-labelledby="tableTitle"
+                size={dense ? "small" : "medium"}
+              >
+                <EnhancedTableHead
+                  numSelected={selected.length}
+                  rowCount={rows.length}
+                />
+                <TableBody>
+                  {rows
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, index) => {
+                      return (
+                        <TableRow
+                          hover
+                          //onClick={(event) => handleClick(event, row.name)}
+                          tabIndex={-1}
+                          key={row.actionObject._id}
                         >
-                          {row.name}
-                        </TableCell>
-                        <TableCell>{row.base_salary}</TableCell>
-                        <TableCell>{row.designation}</TableCell>
-                        <TableCell>{row.location}</TableCell>
-                        <TableCell>{row.date_of_joining}</TableCell>
-                        <TableCell>
-                          <div className="flex space-x-4 text-xl">
-                            <AiFillEdit
-                              onClick={() =>
-                                handleEditEmployee(row.actionObject)
-                              }
-                              title="Edit Payslip"
-                              className="cursor-pointer"
-                            />
-                            <GrView
-                              className="cursor-pointer"
-                              title="View Payslip"
-                              onClick={() => handleMonthModal(row.actionObject)}
-                            />
-                            <MdDeleteForever className="cursor-pointer" title="Delete Payslip" />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                {emptyRows > 0 && (
-                  <TableRow
-                    style={{
-                      height: (dense ? 33 : 53) * emptyRows,
-                    }}
-                  >
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            padding="normal"
+                          >
+                            {row.name}
+                          </TableCell>
+                          <TableCell>{row.total_salary}</TableCell>
+                          <TableCell>{row.designation}</TableCell>
+                          <TableCell>{row.location}</TableCell>
+                          <TableCell>{row.attendance.month_year}</TableCell>
+                          <TableCell>
+                            <div className="flex space-x-4 text-xl">
+                              <GrView
+                                className="cursor-pointer"
+                                title="View Payslip"
+                                onClick={() => {
+                                  setSalarySlipDetails(row.actionObject);
+                                  setShowSalarySlip(true);
+                                }}
+                              />
+                              <MdDeleteForever
+                                className="cursor-pointer"
+                                title="Delete Payslip"
+                                onClick={() =>
+                                  handleDeleteSalarySlip(row.actionObject._id)
+                                }
+                              />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  {emptyRows > 0 && (
+                    <TableRow
+                      style={{
+                        height: (dense ? 33 : 53) * emptyRows,
+                      }}
+                    >
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={rows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Paper>
+          <FormControlLabel
+            control={<Switch checked={dense} onChange={handleChangeDense} />}
+            label="Dense padding"
           />
-        </Paper>
-        <FormControlLabel
-          control={<Switch checked={dense} onChange={handleChangeDense} />}
-          label="Dense padding"
-        />
-      </Box>
+        </Box>
+      </div>
     </div>
   );
 }
