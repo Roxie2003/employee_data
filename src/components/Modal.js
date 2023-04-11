@@ -57,7 +57,7 @@ export default function CustomizedDialogs(props) {
 
   const handleSaveChanges = () => {
     fetch(
-      "https://employee-payroll-api.onrender.com/api/employees/" +
+      "https://employee-data-api.onrender.com/api/employees/" +
         children.props.employee._id,
       {
         headers: {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 
 import Button from "@mui/material/Button";
@@ -19,24 +19,26 @@ export const PaySlip = () => {
 
   const checkIfSalarySlipExists = async () => {
     let URL =
-      `https://employee-payroll-api.onrender.com/api/salarySlips/` +
+      `https://employee-data-api.onrender.com/api/salarySlips/` +
       employee.id +
       "/" +
       month_year +
       "/";
     let data = await fetch(URL);
     let parsedData = await data.json();
-    if (parsedData.data.length === 0) {
+    if (!parsedData.data) {
       setEmployeeWithAtt({
         ...employee,
         income_tax: 0,
-        attendance: employee["attendance"].filter((att) => {
-          if (att.month_year === month_year) console.log(att);
-          return att.month_year === month_year;
-        })[0],
+        attendance: {
+          ...employee["attendance"].filter((att) => {
+            if (att.month_year === month_year) console.log(att);
+            return att.month_year === month_year;
+          })[0],
+        },
       });
     } else {
-      await setSalarySlipDetails(parsedData.data[0]);
+      await setSalarySlipDetails(parsedData.data);
       setShowSalarySlip(true);
     }
   };
@@ -55,18 +57,16 @@ export const PaySlip = () => {
   };
 
   const handleGenerateSlip = async () => {
-    console.log(employeeWithAtt);
     const { id, _id, ...salarySlip } = employeeWithAtt;
     salarySlip["overtime_pay"] =
       (await salarySlip["attendance"].overtime_hrs) * 500;
     salarySlip["total_salary"] = await (salarySlip["base_salary"] +
       salarySlip["overtime_pay"] -
       salarySlip["income_tax"]);
-
-    salarySlip["employee_id"] = await id;
     console.log(salarySlip);
+    salarySlip["employee_id"] = await id;
     fetch(
-      "https://employee-payroll-api.onrender.com/api/salarySlips/" +
+      "https://employee-data-api.onrender.com/api/salarySlips/" +
         salarySlip.employee_id +
         "/",
       {
@@ -89,12 +89,18 @@ export const PaySlip = () => {
         setShowSalarySlip(true);
       });
   };
-
+  const navigate = useNavigate();
   return (
     <div>
       <div>
         {showSalarySlip && salarySlipDetails && (
-          <Invoice salarySlipDetails={salarySlipDetails} />
+          <Invoice
+            salarySlipDetails={salarySlipDetails}
+            handleOnClose={() => {
+              navigate(-1);
+              setShowSalarySlip(false);
+            }}
+          ></Invoice>
         )}
       </div>
       {employeeWithAtt["attendance"] && (

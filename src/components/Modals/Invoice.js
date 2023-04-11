@@ -1,6 +1,6 @@
 import React from "react";
-
-function Invoice({ salarySlipDetails }) {
+import { BsXCircle } from "react-icons/bs";
+function Invoice({ salarySlipDetails, handleOnClose }) {
   console.log(salarySlipDetails);
   let num =
     "Zero One Two Three Four Five Six Seven Eight Nine Ten Eleven Twelve Thirteen Fourteen Fifteen Sixteen Seventeen Eighteen Nineteen".split(
@@ -27,6 +27,12 @@ function Invoice({ salarySlipDetails }) {
     <>
       <div className=" modal fade fixed inset-0 overflow-auto overscroll-none bg-slate-900 bg-opacity-80 backdrop-blur-md flex justify-center z-50">
         <div className="bg-[#FFFFFF] bg-opacity-90 p-4 md:p-10 w-full h-fit max-w-3xl modal-dialog modal-dialog-scrollable relative ">
+          <button className="absolute right-10">
+            <BsXCircle
+              onClick={handleOnClose}
+              className="text-2xl text-red-600"
+            />
+          </button>
           <center>
             <div className="max-w-3xl">
               <div className="flex justify-center align-center space-x-3 my-3">
