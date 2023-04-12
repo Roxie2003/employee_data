@@ -32,8 +32,9 @@ export const PaySlip = () => {
         income_tax: 0,
         attendance: {
           ...employee["attendance"].filter((att) => {
-            if (att.month_year === month_year) console.log(att);
-            return att.month_year === month_year;
+            if (att.month_year === month_year){
+              return att.month_year === month_year;
+            }
           })[0],
         },
       });
@@ -63,7 +64,6 @@ export const PaySlip = () => {
     salarySlip["total_salary"] = await (salarySlip["base_salary"] +
       salarySlip["overtime_pay"] -
       salarySlip["income_tax"]);
-    console.log(salarySlip);
     salarySlip["employee_id"] = await id;
     fetch(
       "https://employee-data-api.onrender.com/api/salarySlips/" +
@@ -84,7 +84,6 @@ export const PaySlip = () => {
         return response.json();
       })
       .then(function (data) {
-        console.log(data);
         setSalarySlipDetails(salarySlip);
         setShowSalarySlip(true);
       });

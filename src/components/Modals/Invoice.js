@@ -1,7 +1,6 @@
 import React from "react";
 import { BsXCircle } from "react-icons/bs";
 function Invoice({ salarySlipDetails, handleOnClose }) {
-  console.log(salarySlipDetails);
   let num =
     "Zero One Two Three Four Five Six Seven Eight Nine Ten Eleven Twelve Thirteen Fourteen Fifteen Sixteen Seventeen Eighteen Nineteen".split(
       " "
@@ -31,6 +30,7 @@ function Invoice({ salarySlipDetails, handleOnClose }) {
             <BsXCircle
               onClick={handleOnClose}
               className="text-2xl text-red-600"
+              id="closeModelIcon"
             />
           </button>
           <center>
@@ -215,8 +215,10 @@ function Invoice({ salarySlipDetails, handleOnClose }) {
               className="bg-red-500 text-[#ffffff] px-3 py-1 rounded-lg "
               onClick={() => {
                 document.getElementById("noprint").style.visibility = "hidden";
+                document.getElementById("closeModelIcon").style.visibility = "hidden";
                 window.print();
                 document.getElementById("noprint").style.visibility = "visible";
+                document.getElementById("closeModelIcon").style.visibility = "visible";
               }}
             >
               Print

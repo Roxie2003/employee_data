@@ -14,7 +14,6 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -28,6 +27,8 @@ import { MdDeleteForever } from "react-icons/md";
 import Modal from "./Modal";
 import Month from "./Modals/Month";
 import EditEmployee from "./Modals/EditEmployee";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -102,11 +103,8 @@ const headCells = [
 
 function EnhancedTableHead(props) {
   const {
-    onSelectAllClick,
     order,
     orderBy,
-    numSelected,
-    rowCount,
     onRequestSort,
   } = props;
   const createSortHandler = (property) => (event) => {
@@ -117,15 +115,7 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              "aria-label": "select all desserts",
-            }}
-          />
+          
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell
@@ -287,26 +277,6 @@ export default function EnhancedTable() {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
-  };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -327,17 +297,14 @@ export default function EnhancedTable() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const handleEmpChange = (e) => {
-    console.log(e);
     setEmployeeForModal({ ...employeeForModal, [e.target.id]: e.target.value });
   };
   const handleEditEmployee = (employeeObj) => {
-    //  console.log(employeeObj);
     setEmployeeForModal(employeeObj);
     setOpenEditEmpModal(!openEditEmpModal);
   };
 
   const handleMonthModal = (employeeObj) => {
-    // console.log(employeeObj);
     setEmployeeForModal(employeeObj);
     setOpenMonthModal(!openMonthModal);
   };
@@ -351,10 +318,18 @@ export default function EnhancedTable() {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setAllEmployee(
           allEmployee.filter((emp) => emp._id !== employeeObj._id)
         );
+        toast.success('Employee Deleted Sucessfully!', {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
       })
       .catch((error) => console.error(error));
   };
@@ -366,6 +341,17 @@ export default function EnhancedTable() {
   };
   return (
     <div>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       {openMonthModal && (
         <Modal
           title="Select Month for Salary"
@@ -417,7 +403,6 @@ export default function EnhancedTable() {
                     return (
                       <TableRow
                         hover
-                        //                      onClick={(event) => handleClick(event, row.name)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
@@ -425,13 +410,7 @@ export default function EnhancedTable() {
                         selected={isItemSelected}
                       >
                         <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              "aria-labelledby": labelId,
-                            }}
-                          />
+                          
                         </TableCell>
                         <TableCell
                           component="th"
@@ -464,7 +443,7 @@ export default function EnhancedTable() {
                               onClick={() =>
                                 window.confirm(
                                   "Do you want to delete this employee?"
-                                ) == true
+                                ) === true
                                   ? handleDeleteEmployee(row.actionObject)
                                   : ""
                               }

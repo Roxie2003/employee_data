@@ -14,7 +14,6 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -22,12 +21,9 @@ import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
-import { AiFillEdit } from "react-icons/ai";
-import { GrDocumentPdf } from "react-icons/gr";
 import { MdDeleteForever } from "react-icons/md";
-import Modal from "./Modal";
-import Month from "./Modals/Month";
-import EditEmployee from "./Modals/EditEmployee";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { GrView } from "react-icons/gr";
 
@@ -68,7 +64,7 @@ const headCells = [
   {
     id: "name",
     numeric: false,
-    disablePadding: false,
+    disablePadding: true,
     label: "Employee Name",
   },
   {
@@ -105,11 +101,8 @@ const headCells = [
 
 function EnhancedTableHead(props) {
   const {
-    onSelectAllClick,
     order,
     orderBy,
-    numSelected,
-    rowCount,
     onRequestSort,
   } = props;
   const createSortHandler = (property) => (event) => {
@@ -120,15 +113,7 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              "aria-label": "select all desserts",
-            }}
-          />
+          
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell
@@ -231,10 +216,7 @@ export default function EnhancedTable() {
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [allEmployee, setAllEmployee] = useState([]);
-  const [openEditEmpModal, setOpenEditEmpModal] = useState(false);
-  const [openMonthModal, setOpenMonthModal] = useState(false);
   const [showSalarySlip, setShowSalarySlip] = useState(false);
-  const [employeeForModal, setEmployeeForModal] = useState({});
   const [salarySlipDetails, setSalarySlipDetails] = useState({});
 
   useEffect(() => {
@@ -292,26 +274,6 @@ export default function EnhancedTable() {
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
-  };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -328,50 +290,47 @@ export default function EnhancedTable() {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  const handleEmpChange = (e) => {
-    console.log(e);
-    setEmployeeForModal({ ...employeeForModal, [e.target.id]: e.target.value });
-  };
-  const handleEditEmployee = (employeeObj) => {
-    //  console.log(employeeObj);
-    setEmployeeForModal(employeeObj);
-    setOpenEditEmpModal(!openEditEmpModal);
-  };
-
-  const handleMonthModal = (employeeObj) => {
-    // console.log(employeeObj);
-    setEmployeeForModal(employeeObj);
-    setOpenMonthModal(!openMonthModal);
-  };
-
-  const handleDeleteSalarySlip = (salarySlipId) => {
-    if (window.confirm("Do you want to delete this salary Slip?") == true) {
-      fetch(
-        "https://employee-data-api.onrender.com/api/salarySlips/" +
-          salarySlipId,
-        {
-          method: "DELETE",
-        }
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          //window.location.reload(true);
-        })
-        .catch((error) => console.error(error));
-    }
+  const handleDeleteSalarySlip = (salarySlipObj) => {
+    fetch(
+      "https://employee-data-api.onrender.com/api/salarySlips/" +
+      salarySlipObj._id,
+      {
+        method: "DELETE",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setAllEmployee(
+          allEmployee.filter((emp) => emp._id !== salarySlipObj._id)
+        );
+        toast.success('Salary Slip Deleted Sucessfully!', {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      })
+      .catch((error) => console.error(error));
   };
 
-  const closeModal = () => {
-    setEmployeeForModal({});
-    setOpenEditEmpModal(false);
-    setOpenMonthModal(false);
-  };
   return (
     <div className="p-4 md:p-10">
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div>
         {showSalarySlip && salarySlipDetails && (
           <Invoice
@@ -405,12 +364,9 @@ export default function EnhancedTable() {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
                     const isItemSelected = isSelected(row.name);
-                    const labelId = `enhanced-table-checkbox-${index}`;
-
                     return (
                       <TableRow
                         hover
-                        //                      onClick={(event) => handleClick(event, row.name)}
                         role="checkbox"
                         aria-checked={isItemSelected}
                         tabIndex={-1}
@@ -418,7 +374,6 @@ export default function EnhancedTable() {
                         selected={isItemSelected}
                       >
                         <TableCell padding="checkbox">
-                          <Checkbox color="primary" checked={isItemSelected} />
                         </TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           {row.name}
@@ -441,8 +396,8 @@ export default function EnhancedTable() {
                               className="cursor-pointer"
                               onClick={() =>
                                 window.confirm(
-                                  "Do you want to delete this employee?"
-                                ) == true
+                                  "Do you want to delete this Salary slip?"
+                                ) === true
                                   ? handleDeleteSalarySlip(row.actionObject)
                                   : ""
                               }

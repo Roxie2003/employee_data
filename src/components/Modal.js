@@ -8,6 +8,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -19,7 +21,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 function BootstrapDialogTitle(props) {
-  const { children, handleClose, ...other } = props;
+  const { children, handleClose } = props;
 
   return (
     <DialogTitle sx={{ m: 0, p: 2 }}>
@@ -58,7 +60,7 @@ export default function CustomizedDialogs(props) {
   const handleSaveChanges = () => {
     fetch(
       "https://employee-data-api.onrender.com/api/employees/" +
-        children.props.employee._id,
+      children.props.employee._id,
       {
         headers: {
           Accept: "application/json",
@@ -71,16 +73,34 @@ export default function CustomizedDialogs(props) {
       }
     )
       .then(function (response) {
-        // console.log(response);
         return response.json();
       })
       .then(function (data) {
-        console.log(data);
+        toast.success('Employee Updated Sucessfully!', {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
         window.location.reload(false);
       });
   };
   return (
     <div>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <BootstrapDialog
         children={title}
         onClose={onClose}
