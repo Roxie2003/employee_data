@@ -21,11 +21,9 @@ import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
-import { MdDeleteForever } from "react-icons/md";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { GrView } from "react-icons/gr";
-import Invoice from "./Modals/Invoice";
+import Invoice from "../Modals/Invoice";
+import { useNavigate } from "react-router-dom";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -67,28 +65,40 @@ const headCells = [
     label: "Employee Name",
   },
   {
+    id: "month_year",
+    numeric: false,
+    disablePadding: false,
+    label: "Month-Year",
+  },
+  {
+    id: "base_salary",
+    numeric: false,
+    disablePadding: false,
+    label: "Base Salary",
+  },
+  {
+    id: "present_days",
+    numeric: false,
+    disablePadding: false,
+    label: "Present Days",
+  },
+  {
+    id: "overtime_pay",
+    numeric: false,
+    disablePadding: false,
+    label: "Overtime Pay",
+  },
+  {
+    id: "income_tax",
+    numeric: false,
+    disablePadding: false,
+    label: "Income Tax",
+  },
+  {
     id: "total_salary",
     numeric: false,
     disablePadding: false,
     label: "Total Salary",
-  },
-  {
-    id: "designation",
-    numeric: false,
-    disablePadding: false,
-    label: "Designation",
-  },
-  {
-    id: "location",
-    numeric: false,
-    disablePadding: false,
-    label: "Location",
-  },
-  {
-    id: "attendance.month_year",
-    numeric: false,
-    disablePadding: false,
-    label: "Salary Slip Month",
   },
   {
     id: "action",
@@ -112,7 +122,7 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
-          
+
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell
@@ -182,7 +192,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Payments
+          Salary Slip
         </Typography>
       )}
 
@@ -207,7 +217,8 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable() {
+export default function UserDashboard() {
+  const navigate = useNavigate();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
@@ -215,12 +226,24 @@ export default function EnhancedTable() {
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [allEmployee, setAllEmployee] = useState([]);
+  const [user, setUser] = useState();
   const [showSalarySlip, setShowSalarySlip] = useState(false);
   const [salarySlipDetails, setSalarySlipDetails] = useState({});
 
   useEffect(() => {
+
+    let localUser = JSON.parse(localStorage.getItem('user'))
+    setUser(localUser)
+    try {
+      if (!localUser) {
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error(error)
+    }
+
     async function fetchData() {
-      let URL = `https://employee-data-api.onrender.com/api/salarySlips/`;
+      let URL = `https://employee-data-api.onrender.com/api/salarySlips/email/${user.email}`;
       let data = await fetch(URL);
       let parsedData = await data.json();
       setAllEmployee(parsedData.data);
@@ -231,18 +254,22 @@ export default function EnhancedTable() {
 
   function createData(
     name,
-    total_salary,
-    designation,
-    location,
     month_year,
+    base_salary,
+    present_days,
+    overtime_pay,
+    income_tax,
+    total_salary,
     actionObject
   ) {
     return {
       name,
-      total_salary,
-      designation,
-      location,
       attendance: { month_year },
+      base_salary,
+      attendance1: { present_days },
+      overtime_pay,
+      income_tax,
+      total_salary,
       actionObject,
     };
   }
@@ -250,10 +277,12 @@ export default function EnhancedTable() {
   const rows = allEmployee.map((item) => {
     return createData(
       item.name,
-      item.total_salary,
-      item.designation,
-      item.location,
       item.attendance.month_year,
+      item.base_salary,
+      item.attendance.present_days,
+      item.overtime_pay,
+      item.income_tax,
+      item.total_salary,
       item
     );
   });
@@ -291,45 +320,8 @@ export default function EnhancedTable() {
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  const handleDeleteSalarySlip = (salarySlipObj) => {
-    fetch(
-      "https://employee-data-api.onrender.com/api/salarySlips/" +
-      salarySlipObj._id,
-      {
-        method: "DELETE",
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setAllEmployee(
-          allEmployee.filter((emp) => emp._id !== salarySlipObj._id)
-        );
-        toast.success('Salary Slip Deleted Sucessfully!', {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      })
-      .catch((error) => console.error(error));
-  };
-
   return (
     <div className="p-4 md:p-10">
-      <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
       <div>
         {showSalarySlip && salarySlipDetails && (
           <Invoice
@@ -375,13 +367,13 @@ export default function EnhancedTable() {
                       >
                         <TableCell padding="checkbox">
                         </TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">
-                          {row.name}
-                        </TableCell>
-                        <TableCell>{row.total_salary}</TableCell>
-                        <TableCell>{row.designation}</TableCell>
-                        <TableCell>{row.location}</TableCell>
+                        <TableCell component="th" id={labelId} scope="row" padding="none">{row.name}</TableCell>
                         <TableCell>{row.attendance.month_year}</TableCell>
+                        <TableCell>{row.base_salary}</TableCell>
+                        <TableCell>{row.attendance1.present_days}</TableCell>
+                        <TableCell>{row.overtime_pay}</TableCell>
+                        <TableCell>{row.income_tax}</TableCell>
+                        <TableCell>{row.total_salary}</TableCell>
                         <TableCell>
                           <div className="flex space-x-4 text-xl">
                             <GrView
@@ -391,16 +383,6 @@ export default function EnhancedTable() {
                                 setSalarySlipDetails(row.actionObject);
                                 setShowSalarySlip(true);
                               }}
-                            />
-                            <MdDeleteForever
-                              className="cursor-pointer"
-                              onClick={() =>
-                                window.confirm(
-                                  "Do you want to delete this Salary slip?"
-                                ) === true
-                                  ? handleDeleteSalarySlip(row.actionObject)
-                                  : ""
-                              }
                             />
                           </div>
                         </TableCell>

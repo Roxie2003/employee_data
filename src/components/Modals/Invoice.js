@@ -214,11 +214,11 @@ function Invoice({ salarySlipDetails, handleOnClose }) {
               id="noprint"
               className="bg-red-500 text-[#ffffff] px-3 py-1 rounded-lg "
               onClick={() => {
-                document.getElementById("noprint").style.visibility = "hidden";
-                document.getElementById("closeModelIcon").style.visibility = "hidden";
+                document.getElementById("noprint").style.display = "none";
+                document.getElementById("closeModelIcon").style.display = "none";
                 window.print();
-                document.getElementById("noprint").style.visibility = "visible";
-                document.getElementById("closeModelIcon").style.visibility = "visible";
+                document.getElementById("noprint").style.display = "block";
+                document.getElementById("closeModelIcon").style.display = "block";
               }}
             >
               Print
