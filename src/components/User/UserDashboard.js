@@ -243,7 +243,7 @@ export default function UserDashboard() {
     }
 
     async function fetchData() {
-      let URL = `https://employee-data-api.onrender.com/api/salarySlips/email/${user.email}`;
+      let URL = `https://employee-data-api.onrender.com/api/salarySlips/email/${localUser.email}`;
       let data = await fetch(URL);
       let parsedData = await data.json();
       setAllEmployee(parsedData.data);
