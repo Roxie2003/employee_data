@@ -8,7 +8,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-function EditEmployee({ employee, onFieldChange }) {
+function CreateEmployee({ employee, onFieldChange }) {
   const onBankFieldChange = (e) => {
     onFieldChange({
       target: {
@@ -26,7 +26,6 @@ function EditEmployee({ employee, onFieldChange }) {
       },
     });
   };
-
   return (
     <Box component="form" noValidate autoComplete="off">
       <h3 className="m-1 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
@@ -38,6 +37,17 @@ function EditEmployee({ employee, onFieldChange }) {
         spacing={4}
         columns={{ xs: 2, sm: 6, md: 12 }}
       >
+        <Grid item xs={2} sm={6} md={12}>
+          <TextField
+            required
+            id="email"
+            label="Email"
+            value={employee.email}
+            variant="standard"
+            onChange={onFieldChange}
+            fullWidth
+          />
+        </Grid>
         <Grid item xs={2} sm={6} md={6}>
           <TextField
             required
@@ -141,4 +151,4 @@ function EditEmployee({ employee, onFieldChange }) {
   );
 }
 
-export default EditEmployee;
+export default CreateEmployee;

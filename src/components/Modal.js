@@ -8,8 +8,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -47,47 +47,23 @@ function BootstrapDialogTitle(props) {
 CustomizedDialogs.propTypes = {
   title: PropTypes.string,
   children: PropTypes.node,
-  endButtonText: PropTypes.string,
   onClose: PropTypes.func.isRequired,
   Modal: PropTypes.bool,
   hasfooter: PropTypes.string,
+  endTitle: PropTypes.string,
 };
 
 export default function CustomizedDialogs(props) {
-  const { title, children, endButtonText, onClose, showModal, ...other } =
-    props;
+  const {
+    title,
+    children,
+    onClose,
+    showModal,
+    endTitle,
+    handleSubmit,
+    ...other
+  } = props;
 
-  const handleSaveChanges = () => {
-    fetch(
-      "https://employee-data-api.onrender.com/api/employees/" +
-      children.props.employee._id,
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        method: "PATCH",
-
-        // Fields that to be updated are passed
-        body: JSON.stringify(children.props.employee),
-      }
-    )
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        toast.success('Employee Updated Sucessfully!', {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-        window.location.reload(false);
-      });
-  };
   return (
     <div>
       <ToastContainer
@@ -118,8 +94,8 @@ export default function CustomizedDialogs(props) {
         <DialogContent dividers>{children}</DialogContent>
         {other.hasfooter === "true" && (
           <DialogActions>
-            <Button autoFocus variant="contained" onClick={handleSaveChanges}>
-              Save changes
+            <Button autoFocus variant="contained" onClick={handleSubmit}>
+              {endTitle}
             </Button>
           </DialogActions>
         )}

@@ -12,50 +12,57 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Navbar() {
   const [user, setUser] = useState();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const adminPages = ["Salary Slips"];
+  const adminPages = ["All Employees", "Generate Salary Slips", "Salary Slips"];
   const employeePages = [];
-  const employeeSettings = ["Dashboard", "My Account", "Logout"];
-  const adminSettings = ["Dashboard", "Logout"];
+  const employeeSettings = [
+    "Dashboard",
+    "My Account",
+    "Edit Password",
+    "Logout",
+  ];
+  const adminSettings = ["Dashboard", "Add Admin", "Logout"];
 
   useEffect(() => {
-    let localUser = JSON.parse(localStorage.getItem('user'))
-    setUser(localUser)
+    let localUser = JSON.parse(localStorage.getItem("user"));
+    setUser(localUser);
 
     //eslint-disable-next-line
   }, []);
 
   const settingsRedirect = (setting) => {
-    if (setting === 'Dashboard') {
-      return '/';
+    if (setting === "Dashboard") {
+      return "/";
+    } else if (setting === "My Account") {
+      return "/myaccount";
+    } else if (setting === "Edit Password") {
+      return "/editpassword";
+    } else if (setting === "Logout") {
+      return "/login";
     }
-    else if (setting === 'My Account') {
-      return '/myaccount';
-    }
-    else if (setting === 'Logout') {
-      return '/login';
-    }
-  }
+  };
 
   const adminSettingsRedirect = (setting) => {
-    if (setting === 'Dashboard') {
-      return '/dashboard';
+    if (setting === "Dashboard") {
+      return "/dashboard";
+    } else if (setting === "Add Admin") {
+      return "/addAdmin";
+    } else if (setting === "Logout") {
+      return "/login";
     }
-    else if (setting === 'Logout') {
-      return '/login';
-    }
-  }
+  };
 
   const logout = () => {
+    setUser({});
     localStorage.clear();
-  }
+  };
 
-  const blankFunc = () => { }
+  const blankFunc = () => {};
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -77,7 +84,6 @@ function Navbar() {
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-
             <Box sx={{ flexGrow: 0, display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"
@@ -107,26 +113,24 @@ function Navbar() {
                   display: { xs: "block", md: "none" },
                 }}
               >
-                {
-                  user && user.admin &&
+                {user &&
+                  user.admin &&
                   adminPages.map((page) => (
                     <MenuItem key={page} onClick={handleCloseNavMenu}>
-                      <Link to='/salarySlip'>
+                      <NavLink to="/salarySlip">
                         <Typography textAlign="center">{page}</Typography>
-                      </Link>
+                      </NavLink>
                     </MenuItem>
-                  ))
-                }
-                {
-                  user && user.employee &&
+                  ))}
+                {user &&
+                  user.employee &&
                   employeePages.map((page) => (
                     <MenuItem key={page} onClick={handleCloseNavMenu}>
-                      <Link to=''>
+                      <NavLink to="">
                         <Typography textAlign="center">{page}</Typography>
-                      </Link>
+                      </NavLink>
                     </MenuItem>
-                  ))
-                }
+                  ))}
               </Menu>
             </Box>
 
@@ -171,25 +175,45 @@ function Navbar() {
               Payroll Management
             </Typography>
 
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              {
-                user && user.admin &&
-                adminPages.map((page) => (
-                  <Link to="/salarySlip" key={page}>
+            <Box
+              className="navbar"
+              sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}
+            >
+              {user && user.admin && (
+                <>
+                  <NavLink to="/dashboard" key={adminPages[0]}>
                     <Button
-                      key={page}
+                      key={adminPages[0]}
                       onClick={handleCloseNavMenu}
                       sx={{ my: 2, color: "white", display: "block" }}
                     >
-                      {page}
+                      {adminPages[0]}
                     </Button>
-                  </Link>
-                ))
-              }
-              {
-                user && user.employee &&
+                  </NavLink>
+                  <NavLink to="/generateSalarySlip" key={adminPages[1]}>
+                    <Button
+                      key={adminPages[1]}
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 2, color: "white", display: "block" }}
+                    >
+                      {adminPages[1]}
+                    </Button>
+                  </NavLink>
+                  <NavLink to="/salarySlip" key={adminPages[2]}>
+                    <Button
+                      key={adminPages[2]}
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 2, color: "white", display: "block" }}
+                    >
+                      {adminPages[2]}
+                    </Button>
+                  </NavLink>
+                </>
+              )}
+              {user &&
+                user.employee &&
                 employeePages.map((page) => (
-                  <Link to="" key={page}>
+                  <NavLink to="" key={page}>
                     <Button
                       key={page}
                       onClick={handleCloseNavMenu}
@@ -197,17 +221,18 @@ function Navbar() {
                     >
                       {page}
                     </Button>
-                  </Link>
-                ))
-              }
+                  </NavLink>
+                ))}
             </Box>
 
-            {
-              user && user.employee &&
-              <Box sx={{ flexGrow: 0 }}>
+            {user && user.employee && (
+              <Box sx={{ flexGrow: 0 }} className="settings">
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt={(user.email).toUpperCase()} src="/static/images/avatar/2.jpg" />
+                    <Avatar
+                      alt={user.email.toUpperCase()}
+                      src="/static/images/avatar/2.jpg"
+                    />
                   </IconButton>
                 </Tooltip>
                 <Menu
@@ -227,24 +252,33 @@ function Navbar() {
                   onClose={handleCloseUserMenu}
                 >
                   {employeeSettings.map((setting) => (
-                    <MenuItem key={setting} onClick={handleCloseUserMenu} to="/">
-                      <Link to={settingsRedirect(setting)}>
-                        <Button onClick={setting === 'Logout' ? logout : blankFunc} sx={{ color: "black" }}>
+                    <MenuItem
+                      key={setting}
+                      onClick={handleCloseUserMenu}
+                      to="/"
+                    >
+                      <NavLink to={settingsRedirect(setting)}>
+                        <Button
+                          onClick={setting === "Logout" ? logout : blankFunc}
+                          sx={{ color: "black" }}
+                        >
                           <Typography textAlign="center">{setting}</Typography>
                         </Button>
-                      </Link>
+                      </NavLink>
                     </MenuItem>
                   ))}
                 </Menu>
               </Box>
-            }
+            )}
 
-            {
-              user && user.admin &&
+            {user && user.admin && (
               <Box sx={{ flexGrow: 0 }}>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                    <Avatar
+                      alt="Remy Sharp"
+                      src="/static/images/avatar/2.jpg"
+                    />
                   </IconButton>
                 </Tooltip>
                 <Menu
@@ -264,18 +298,24 @@ function Navbar() {
                   onClose={handleCloseUserMenu}
                 >
                   {adminSettings.map((setting) => (
-                    <MenuItem key={setting} onClick={handleCloseUserMenu} to="/">
-                      <Link to={adminSettingsRedirect(setting)}>
-                        <Button onClick={setting === 'Logout' ? logout : blankFunc} sx={{ color: "black" }}>
+                    <MenuItem
+                      key={setting}
+                      onClick={handleCloseUserMenu}
+                      to="/"
+                    >
+                      <NavLink to={adminSettingsRedirect(setting)}>
+                        <Button
+                          onClick={setting === "Logout" ? logout : blankFunc}
+                          sx={{ color: "black" }}
+                        >
                           <Typography textAlign="center">{setting}</Typography>
                         </Button>
-                      </Link>
+                      </NavLink>
                     </MenuItem>
                   ))}
                 </Menu>
               </Box>
-            }
-
+            )}
           </Toolbar>
         </Container>
       </AppBar>

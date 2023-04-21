@@ -6,13 +6,13 @@ import { useNavigate } from "react-router-dom";
 export const Home = () => {
   const navigate = useNavigate();
   useEffect(() => {
-    let user = JSON.parse(localStorage.getItem('user'))
+    let user = JSON.parse(localStorage.getItem("user"));
     try {
       if (!user) {
         navigate("/login");
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
     //eslint-disable-next-line
   }, []);

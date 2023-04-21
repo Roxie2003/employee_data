@@ -22,10 +22,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 import { MdDeleteForever } from "react-icons/md";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { GrView } from "react-icons/gr";
-import Invoice from "./Modals/Invoice";
+import Invoice from "../Modals/Invoice";
+import { useNavigate } from "react-router-dom";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -99,11 +100,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const {
-    order,
-    orderBy,
-    onRequestSort,
-  } = props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -111,9 +108,7 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          
-        </TableCell>
+        <TableCell padding="checkbox"></TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -217,8 +212,18 @@ export default function EnhancedTable() {
   const [allEmployee, setAllEmployee] = useState([]);
   const [showSalarySlip, setShowSalarySlip] = useState(false);
   const [salarySlipDetails, setSalarySlipDetails] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
+    let user = JSON.parse(localStorage.getItem("user"));
+    try {
+      if (!user) {
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
     async function fetchData() {
       let URL = `https://employee-data-api.onrender.com/api/salarySlips/`;
       let data = await fetch(URL);
@@ -289,12 +294,13 @@ export default function EnhancedTable() {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const handleDeleteSalarySlip = (salarySlipObj) => {
     fetch(
       "https://employee-data-api.onrender.com/api/salarySlips/" +
-      salarySlipObj._id,
+        salarySlipObj._id,
       {
         method: "DELETE",
       }
@@ -304,7 +310,7 @@ export default function EnhancedTable() {
         setAllEmployee(
           allEmployee.filter((emp) => emp._id !== salarySlipObj._id)
         );
-        toast.success('Salary Slip Deleted Sucessfully!', {
+        toast.success("Salary Slip Deleted Sucessfully!", {
           position: "top-center",
           autoClose: 3000,
           hideProgressBar: false,
@@ -373,9 +379,13 @@ export default function EnhancedTable() {
                         key={row.actionObject._id}
                         selected={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
-                        </TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">
+                        <TableCell padding="checkbox"></TableCell>
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                        >
                           {row.name}
                         </TableCell>
                         <TableCell>{row.total_salary}</TableCell>

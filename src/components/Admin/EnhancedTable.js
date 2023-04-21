@@ -15,6 +15,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
 import Tooltip from "@mui/material/Tooltip";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
@@ -24,11 +26,12 @@ import { visuallyHidden } from "@mui/utils";
 import { AiFillEdit } from "react-icons/ai";
 import { GrDocumentPdf } from "react-icons/gr";
 import { MdDeleteForever } from "react-icons/md";
-import Modal from "./Modal";
-import Month from "./Modals/Month";
-import EditEmployee from "./Modals/EditEmployee";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Modal from "../Modal";
+import Month from "../Modals/Month";
+import EditEmployee from "../Modals/EditEmployee";
+import CreateEmployee from "../Modals/CreateEmployee";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -102,11 +105,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const {
-    order,
-    orderBy,
-    onRequestSort,
-  } = props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -114,9 +113,7 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          
-        </TableCell>
+        <TableCell padding="checkbox"></TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -219,6 +216,7 @@ export default function EnhancedTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [allEmployee, setAllEmployee] = useState([]);
   const [openEditEmpModal, setOpenEditEmpModal] = useState(false);
+  const [openCreateEmpModal, setOpenCreateEmpModal] = useState(false);
   const [openMonthModal, setOpenMonthModal] = useState(false);
   const [employeeForModal, setEmployeeForModal] = useState({});
 
@@ -298,6 +296,7 @@ export default function EnhancedTable() {
 
   const handleEmpChange = (e) => {
     setEmployeeForModal({ ...employeeForModal, [e.target.id]: e.target.value });
+    console.log(employeeForModal);
   };
   const handleEditEmployee = (employeeObj) => {
     setEmployeeForModal(employeeObj);
@@ -307,6 +306,19 @@ export default function EnhancedTable() {
   const handleMonthModal = (employeeObj) => {
     setEmployeeForModal(employeeObj);
     setOpenMonthModal(!openMonthModal);
+  };
+
+  const handleCreateEmployee = (employeeObj) => {
+    setEmployeeForModal({
+      name: "",
+      email: "",
+      designation: "",
+      location: "",
+      base_salary: 0,
+      date_of_joining: new Date(),
+      bank_details: { acc_no: 0, name: "", IFSC_code: 0 },
+    });
+    setOpenCreateEmpModal(!openCreateEmpModal);
   };
 
   const handleDeleteEmployee = (employeeObj) => {
@@ -321,7 +333,7 @@ export default function EnhancedTable() {
         setAllEmployee(
           allEmployee.filter((emp) => emp._id !== employeeObj._id)
         );
-        toast.success('Employee Deleted Sucessfully!', {
+        toast.success("Employee Deleted Sucessfully!", {
           position: "top-center",
           autoClose: 3000,
           hideProgressBar: false,
@@ -334,10 +346,74 @@ export default function EnhancedTable() {
       .catch((error) => console.error(error));
   };
 
+  const handleEditEmployeeSave = (employeeObj) => {
+    fetch(
+      "https://employee-data-api.onrender.com/api/employees/" + employeeObj._id,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        method: "PATCH",
+
+        // Fields that to be updated are passed
+        body: JSON.stringify(employeeObj),
+      }
+    )
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        toast.success("Employee Updated Sucessfully!", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        window.location.reload(false);
+      });
+  };
+
+  const handleCreateEmployeeNew = (employeeObj) => {
+    console.log(employeeObj);
+    fetch("https://employee-data-api.onrender.com/api/employees/", {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+
+      // Fields that to be updated are passed
+      body: JSON.stringify(employeeObj),
+    })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        toast.success("Employee Created Sucessfully!", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        window.location.reload(false);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
   const closeModal = () => {
     setEmployeeForModal({});
     setOpenEditEmpModal(false);
     setOpenMonthModal(false);
+    setOpenCreateEmpModal(false);
   };
   return (
     <div>
@@ -364,6 +440,8 @@ export default function EnhancedTable() {
       {openEditEmpModal && (
         <Modal
           title="Edit Employee Info"
+          endTitle="Save Changes"
+          handleSubmit={() => handleEditEmployeeSave(employeeForModal)}
           children={
             <EditEmployee
               employee={employeeForModal}
@@ -372,6 +450,22 @@ export default function EnhancedTable() {
           }
           onClose={closeModal}
           showModal={openEditEmpModal}
+          hasfooter={"true"}
+        />
+      )}
+      {openCreateEmpModal && (
+        <Modal
+          title="Create New Employee"
+          endTitle="Create Employee"
+          handleSubmit={() => handleCreateEmployeeNew(employeeForModal)}
+          children={
+            <CreateEmployee
+              employee={employeeForModal}
+              onFieldChange={handleEmpChange}
+            />
+          }
+          onClose={closeModal}
+          showModal={openCreateEmpModal}
           hasfooter={"true"}
         />
       )}
@@ -409,9 +503,7 @@ export default function EnhancedTable() {
                         key={row.name}
                         selected={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
-                          
-                        </TableCell>
+                        <TableCell padding="checkbox"></TableCell>
                         <TableCell
                           component="th"
                           id={labelId}
@@ -434,10 +526,6 @@ export default function EnhancedTable() {
                               }
                               className="cursor-pointer"
                             />
-                            <GrDocumentPdf
-                              className="cursor-pointer"
-                              onClick={() => handleMonthModal(row.actionObject)}
-                            />
                             <MdDeleteForever
                               className="cursor-pointer"
                               onClick={() =>
@@ -447,6 +535,10 @@ export default function EnhancedTable() {
                                   ? handleDeleteEmployee(row.actionObject)
                                   : ""
                               }
+                            />
+                            <GrDocumentPdf
+                              className="cursor-pointer"
+                              onClick={() => handleMonthModal(row.actionObject)}
                             />
                           </div>
                         </TableCell>
@@ -475,10 +567,15 @@ export default function EnhancedTable() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Paper>
-        <FormControlLabel
-          control={<Switch checked={dense} onChange={handleChangeDense} />}
-          label="Dense padding"
-        />
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <FormControlLabel
+            control={<Switch checked={dense} onChange={handleChangeDense} />}
+            label="Dense padding"
+          />
+          <Fab color="primary" aria-label="add">
+            <AddIcon onClick={() => handleCreateEmployee()} />
+          </Fab>
+        </Box>
       </Box>
     </div>
   );

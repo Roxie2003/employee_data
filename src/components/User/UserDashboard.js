@@ -109,11 +109,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const {
-    order,
-    orderBy,
-    onRequestSort,
-  } = props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -121,9 +117,7 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-
-        </TableCell>
+        <TableCell padding="checkbox"></TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -231,15 +225,14 @@ export default function UserDashboard() {
   const [salarySlipDetails, setSalarySlipDetails] = useState({});
 
   useEffect(() => {
-
-    let localUser = JSON.parse(localStorage.getItem('user'))
-    setUser(localUser)
+    let localUser = JSON.parse(localStorage.getItem("user"));
+    setUser(localUser);
     try {
       if (!localUser) {
         navigate("/login");
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
 
     async function fetchData() {
@@ -318,7 +311,8 @@ export default function UserDashboard() {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   return (
     <div className="p-4 md:p-10">
@@ -365,9 +359,15 @@ export default function UserDashboard() {
                         key={row.actionObject._id}
                         selected={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
+                        <TableCell padding="checkbox"></TableCell>
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                        >
+                          {row.name}
                         </TableCell>
-                        <TableCell component="th" id={labelId} scope="row" padding="none">{row.name}</TableCell>
                         <TableCell>{row.attendance.month_year}</TableCell>
                         <TableCell>{row.base_salary}</TableCell>
                         <TableCell>{row.attendance1.present_days}</TableCell>

@@ -8,8 +8,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function UserAccount() {
   const navigate = useNavigate();
@@ -25,31 +25,33 @@ export default function UserAccount() {
     bank_details: {
       acc_no: "",
       name: "",
-      IFSC_code: ""
+      IFSC_code: "",
     },
   });
 
   useEffect(() => {
-    let localUser = JSON.parse(localStorage.getItem('user')) 
-    setUser(localUser)
+    let localUser = JSON.parse(localStorage.getItem("user"));
+    setUser(localUser);
     try {
       if (!localUser) {
         navigate("/login");
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
 
-    fetch(`https://employee-data-api.onrender.com/api/employees/email/${localUser.email}`)
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (data) {
-      setEmployee({
-        ...employee,
-        ...data.data
+    fetch(
+      `https://employee-data-api.onrender.com/api/employees/email/${localUser.email}`
+    )
+      .then(function (response) {
+        return response.json();
       })
-    });
+      .then(function (data) {
+        setEmployee({
+          ...employee,
+          ...data.data,
+        });
+      });
 
     //eslint-disable-next-line
   }, []);
@@ -58,7 +60,7 @@ export default function UserAccount() {
     setEmployee({
       ...employee,
       [e.target.id]: e.target.value,
-    })
+    });
   };
 
   const onBankFieldChange = (e) => {
@@ -80,7 +82,7 @@ export default function UserAccount() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     fetch(
       "https://employee-data-api.onrender.com/api/employees/" + employee._id,
       {
@@ -98,7 +100,7 @@ export default function UserAccount() {
         return response.json();
       })
       .then(function (data) {
-        toast.success('Details Updated Sucessfully!', {
+        toast.success("Details Updated Sucessfully!", {
           position: "top-center",
           autoClose: 3000,
           hideProgressBar: false,
@@ -107,8 +109,9 @@ export default function UserAccount() {
           draggable: true,
           progress: undefined,
         });
+        navigate("/");
       });
-  }
+  };
 
   return (
     <div className="flex justify-center mt-8">
@@ -123,7 +126,13 @@ export default function UserAccount() {
         draggable
         pauseOnHover
       />
-      <Box component="form" noValidate autoComplete="off" maxWidth="lg" className="">
+      <Box
+        component="form"
+        noValidate
+        autoComplete="off"
+        maxWidth="lg"
+        className=""
+      >
         <h3 className="m-1 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
           My Account - Personal Details
         </h3>
@@ -257,4 +266,4 @@ export default function UserAccount() {
       </Box>
     </div>
   );
-};
+}

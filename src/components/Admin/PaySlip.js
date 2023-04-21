@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 
 import Button from "@mui/material/Button";
-import Invoice from "./Modals/Invoice";
+import Invoice from "../Modals/Invoice";
 
 export const PaySlip = () => {
   const location = useLocation();
@@ -32,7 +32,7 @@ export const PaySlip = () => {
         income_tax: 0,
         attendance: {
           ...employee["attendance"].filter((att) => {
-            if (att.month_year === month_year){
+            if (att.month_year === month_year) {
               return att.month_year === month_year;
             }
           })[0],
