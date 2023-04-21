@@ -14,12 +14,12 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { Link } from "react-router-dom";
 
-
 function Navbar() {
   const [user, setUser] = useState();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const pages = ["Salary Slips"];
+  const adminPages = ["Salary Slips"];
+  const employeePages = [];
   const employeeSettings = ["Dashboard", "My Account", "Logout"];
   const adminSettings = ["Dashboard", "Logout"];
 
@@ -77,31 +77,8 @@ function Navbar() {
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <img
-              src="./logo.png"
-              alt="logo"
-              className="hidden md:block w-10 md:mr-4"
-            />
-            <Link to="">
-              <Typography
-                variant="h6"
-                noWrap
-                component="a"
-                href=""
-                sx={{
-                  mr: 2,
-                  display: { xs: "none", md: "flex" },
-                  fontFamily: "monospace",
-                  fontWeight: 700,
-                  color: "inherit",
-                  textDecoration: "none",
-                }}
-              >
-                Payroll Management
-              </Typography>
-            </Link>
 
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+            <Box sx={{ flexGrow: 0, display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"
                 aria-label="account of current user"
@@ -130,40 +107,89 @@ function Navbar() {
                   display: { xs: "block", md: "none" },
                 }}
               >
-                {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page}</Typography>
-                  </MenuItem>
-                ))}
+                {
+                  user && user.admin &&
+                  adminPages.map((page) => (
+                    <MenuItem key={page} onClick={handleCloseNavMenu}>
+                      <Link to='/salarySlip'>
+                        <Typography textAlign="center">{page}</Typography>
+                      </Link>
+                    </MenuItem>
+                  ))
+                }
+                {
+                  user && user.employee &&
+                  employeePages.map((page) => (
+                    <MenuItem key={page} onClick={handleCloseNavMenu}>
+                      <Link to=''>
+                        <Typography textAlign="center">{page}</Typography>
+                      </Link>
+                    </MenuItem>
+                  ))
+                }
               </Menu>
             </Box>
 
+            <img
+              src="./logo.png"
+              alt="logo"
+              className="hidden md:block w-10 md:mr-4"
+            />
+            <Typography
+              variant="h6"
+              noWrap
+              component="a"
+              href=""
+              sx={{
+                mr: 2,
+                display: { xs: "none", md: "flex" },
+                fontFamily: "monospace",
+                fontWeight: 700,
+                color: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              Payroll Management
+            </Typography>
+
             <img src="./logo.png" alt="logo" className="md:hidden w-8 mr-2" />
-            <Link to="">
-              <Typography
-                variant="h5"
-                noWrap
-                component="a"
-                href=""
-                sx={{
-                  mr: 2,
-                  display: { xs: "flex", md: "none" },
-                  flexGrow: 1,
-                  fontFamily: "monospace",
-                  fontWeight: 700,
-                  color: "inherit",
-                  textDecoration: "none",
-                }}
-              >
-                Payroll Management
-              </Typography>
-            </Link>
+            <Typography
+              variant="h5"
+              noWrap
+              component="a"
+              href=""
+              sx={{
+                mr: 2,
+                display: { xs: "flex", md: "none" },
+                flexGrow: 1,
+                // fontFamily: "monospace",
+                fontWeight: 700,
+                color: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              Payroll Management
+            </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               {
                 user && user.admin &&
-                pages.map((page) => (
+                adminPages.map((page) => (
                   <Link to="/salarySlip" key={page}>
+                    <Button
+                      key={page}
+                      onClick={handleCloseNavMenu}
+                      sx={{ my: 2, color: "white", display: "block" }}
+                    >
+                      {page}
+                    </Button>
+                  </Link>
+                ))
+              }
+              {
+                user && user.employee &&
+                employeePages.map((page) => (
+                  <Link to="" key={page}>
                     <Button
                       key={page}
                       onClick={handleCloseNavMenu}
@@ -181,7 +207,7 @@ function Navbar() {
               <Box sx={{ flexGrow: 0 }}>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                    <Avatar alt={(user.email).toUpperCase()} src="/static/images/avatar/2.jpg" />
                   </IconButton>
                 </Tooltip>
                 <Menu

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,6 +13,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import jwt_decode from "jwt-decode";
 
 function Copyright(props) {
   return (
@@ -35,6 +36,73 @@ export default function Signup() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [gAuthUser, setGAuthUser] = useState(null);
+
+  const handleCallbackResponse = (response) => {
+    let userObject = jwt_decode(response.credential);
+    setGAuthUser(userObject)
+    
+    try {
+      fetch(
+        "https://employee-data-api.onrender.com/api/employees/gauth",
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+
+          // Fields that to be updated are passed
+          body: JSON.stringify({
+            name: userObject.name,
+            email: userObject.email,
+          }),
+        }
+      )
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          if (data.sucess) {
+            localStorage.setItem('user', JSON.stringify({ token: data.token, email: data.email, employee: true }))
+            navigate("/");
+          }
+          else {
+            toast.error(data.error, {
+              position: "top-center",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    // / * global google */
+    //eslint-disable-next-line
+    google.accounts.id.initialize({
+      client_id: "289036486479-pplpa2filjtri6v1efqn7s51818l0nls.apps.googleusercontent.com",
+      callback: handleCallbackResponse
+    });
+
+    //eslint-disable-next-line
+    google.accounts.id.renderButton(
+      document.getElementById("googleAuthDiv"),
+      { theme: "outline", size: "large" }
+    );
+
+    //eslint-disable-next-line
+    google.accounts.id.prompt();
+
+    //eslint-disable-next-line
+  }, [gAuthUser]);
 
   const handleChange = (e) => {
     if (e.target.name === 'firstName') {
@@ -79,7 +147,7 @@ export default function Signup() {
             localStorage.setItem('user', JSON.stringify({ token: data.token, email: data.email, employee: true }))
             navigate("/");
           }
-          else{
+          else {
             toast.error(data.error, {
               position: "top-center",
               autoClose: 3000,
@@ -216,6 +284,17 @@ export default function Signup() {
                 </Link>
               </Grid>
             </Grid>
+
+            <div className="my-6 flex items-center">
+              <div className="flex-grow bg bg-gray-300 h-0.5"></div>
+              <div className="flex-grow-0 mx-5">or continue with Google</div>
+              <div className="flex-grow bg bg-gray-300 h-0.5"></div>
+            </div>
+
+            <center>
+              <div id="googleAuthDiv" className="w-[80vw] md:w-[20vw]"></div>
+            </center>
+
           </Box>
         </Box>
         <Copyright sx={{ mt: 5 }} />
