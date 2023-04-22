@@ -113,15 +113,49 @@ function Navbar() {
                   display: { xs: "block", md: "none" },
                 }}
               >
-                {user &&
-                  user.admin &&
-                  adminPages.map((page) => (
-                    <MenuItem key={page} onClick={handleCloseNavMenu}>
-                      <NavLink to="/salarySlip">
-                        <Typography textAlign="center">{page}</Typography>
+                {user && user.admin && (
+                  <>
+                    <MenuItem
+                      key={adminPages[0]}
+                      onClick={handleCloseNavMenu}
+                      sx={{ p: 0 }}
+                    >
+                      <NavLink
+                        to="/dashboard"
+                        key={adminPages[0]}
+                        style={{ width: "100%" }}
+                      >
+                        <Typography sx={{ p: 2 }}>{adminPages[0]}</Typography>
                       </NavLink>
                     </MenuItem>
-                  ))}
+                    <MenuItem
+                      key={adminPages[1]}
+                      onClick={handleCloseNavMenu}
+                      sx={{ p: 0 }}
+                    >
+                      <NavLink
+                        to="/generateSalarySlip"
+                        key={adminPages[1]}
+                        style={{ width: "100%" }}
+                      >
+                        <Typography sx={{ p: 2 }}>{adminPages[1]}</Typography>
+                      </NavLink>
+                    </MenuItem>
+                    <MenuItem
+                      key={adminPages[2]}
+                      onClick={handleCloseNavMenu}
+                      sx={{ p: 0 }}
+                    >
+                      <NavLink
+                        to="/salarySlip"
+                        key={adminPages[2]}
+                        style={{ width: "100%" }}
+                      >
+                        <Typography sx={{ p: 2 }}>{adminPages[2]}</Typography>
+                      </NavLink>
+                    </MenuItem>
+                  </>
+                )}
                 {user &&
                   user.employee &&
                   employeePages.map((page) => (
