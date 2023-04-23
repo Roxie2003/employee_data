@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import dayjs from "dayjs";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
@@ -10,10 +10,11 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { LocalContext } from "../Auth/Context";
 export default function UserAccount() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useContext(LocalContext);
+
   const [employee, setEmployee] = useState({
     id: "",
     name: "",
@@ -30,10 +31,8 @@ export default function UserAccount() {
   });
 
   useEffect(() => {
-    let localUser = JSON.parse(localStorage.getItem("user"));
-    setUser(localUser);
     try {
-      if (!localUser) {
+      if (!user.employee) {
         navigate("/login");
       }
     } catch (error) {
@@ -41,7 +40,7 @@ export default function UserAccount() {
     }
 
     fetch(
-      `https://employee-data-api.onrender.com/api/employees/email/${localUser.email}`
+      `https://employee-data-api.onrender.com/api/employees/email/${user.email}`
     )
       .then(function (response) {
         return response.json();

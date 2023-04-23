@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -24,7 +24,7 @@ import { visuallyHidden } from "@mui/utils";
 import { GrView } from "react-icons/gr";
 import Invoice from "../Modals/Invoice";
 import { useNavigate } from "react-router-dom";
-
+import { LocalContext } from "../Auth/Context";
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -213,6 +213,7 @@ EnhancedTableToolbar.propTypes = {
 
 export default function UserDashboard() {
   const navigate = useNavigate();
+  const [user, setUser] = useContext(LocalContext);
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
@@ -220,15 +221,12 @@ export default function UserDashboard() {
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [allEmployee, setAllEmployee] = useState([]);
-  const [user, setUser] = useState();
   const [showSalarySlip, setShowSalarySlip] = useState(false);
   const [salarySlipDetails, setSalarySlipDetails] = useState({});
 
   useEffect(() => {
-    let localUser = JSON.parse(localStorage.getItem("user"));
-    setUser(localUser);
     try {
-      if (!localUser) {
+      if (!user.employee) {
         navigate("/login");
       }
     } catch (error) {
@@ -236,7 +234,7 @@ export default function UserDashboard() {
     }
 
     async function fetchData() {
-      let URL = `https://employee-data-api.onrender.com/api/salarySlips/email/${localUser.email}`;
+      let URL = `https://employee-data-api.onrender.com/api/salarySlips/email/${user.email}`;
       let data = await fetch(URL);
       let parsedData = await data.json();
       setAllEmployee(parsedData.data);

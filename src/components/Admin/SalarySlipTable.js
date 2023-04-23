@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -27,7 +27,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { GrView } from "react-icons/gr";
 import Invoice from "../Modals/Invoice";
 import { useNavigate } from "react-router-dom";
-
+import { LocalContext } from "../Auth/Context";
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -203,6 +203,7 @@ EnhancedTableToolbar.propTypes = {
 };
 
 export default function EnhancedTable() {
+  const [user, setUser] = useContext(LocalContext);
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
@@ -215,9 +216,8 @@ export default function EnhancedTable() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let user = JSON.parse(localStorage.getItem("user"));
     try {
-      if (!user) {
+      if (!user.admin) {
         navigate("/login");
       }
     } catch (error) {

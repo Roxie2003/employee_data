@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -13,11 +13,12 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { NavLink } from "react-router-dom";
+import { LocalContext } from "./Auth/Context";
 
 function Navbar() {
-  const [user, setUser] = useState();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [user, setUser] = useContext(LocalContext);
   const adminPages = ["All Employees", "Generate Salary Slips", "Salary Slips"];
   const employeePages = [];
   const employeeSettings = [
@@ -29,9 +30,6 @@ function Navbar() {
   const adminSettings = ["Dashboard", "Add Admin", "Logout"];
 
   useEffect(() => {
-    let localUser = JSON.parse(localStorage.getItem("user"));
-    setUser(localUser);
-
     //eslint-disable-next-line
   }, []);
 
@@ -58,7 +56,7 @@ function Navbar() {
   };
 
   const logout = () => {
-    setUser({});
+    setUser(null);
     localStorage.clear();
   };
 
@@ -114,7 +112,7 @@ function Navbar() {
                 }}
               >
                 {user && user.admin && (
-                  <>
+                  <div>
                     <MenuItem
                       key={adminPages[0]}
                       onClick={handleCloseNavMenu}
@@ -154,7 +152,7 @@ function Navbar() {
                         <Typography sx={{ p: 2 }}>{adminPages[2]}</Typography>
                       </NavLink>
                     </MenuItem>
-                  </>
+                  </div>
                 )}
                 {user &&
                   user.employee &&

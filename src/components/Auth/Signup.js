@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jwt_decode from "jwt-decode";
-
+import { LocalContext } from "./Context";
 function Copyright(props) {
   return (
     <Typography
@@ -37,6 +37,8 @@ const theme = createTheme();
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [user, setUser] = useContext(LocalContext);
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -74,6 +76,8 @@ export default function Signup() {
                 employee: true,
               })
             );
+            setUser(JSON.parse(localStorage.getItem("user")));
+
             navigate("/");
           } else {
             toast.error(data.error, {
@@ -155,6 +159,8 @@ export default function Signup() {
                 employee: true,
               })
             );
+            setUser(JSON.parse(localStorage.getItem("user")));
+
             navigate("/");
           } else {
             toast.error(data.error, {

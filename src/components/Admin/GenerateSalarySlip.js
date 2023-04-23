@@ -1,6 +1,6 @@
 //Generates Month Year wise Salary slips
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -31,6 +31,7 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import "react-toastify/dist/ReactToastify.css";
+import { LocalContext } from "../Auth/Context";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -207,6 +208,7 @@ GenerateSalarySlipToolbar.propTypes = {
 };
 
 export default function GenerateSalarySlip() {
+  const [user, setUser] = useContext(LocalContext);
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
@@ -239,9 +241,8 @@ export default function GenerateSalarySlip() {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-    let user = JSON.parse(localStorage.getItem("user"));
     try {
-      if (!user) {
+      if (!user.admin) {
         navigate("/login");
       }
     } catch (error) {
@@ -424,9 +425,8 @@ export default function GenerateSalarySlip() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    let user = JSON.parse(localStorage.getItem("user"));
     try {
-      if (!user) {
+      if (!user.admin) {
         navigate("/login");
       }
     } catch (error) {

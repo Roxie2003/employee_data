@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jwt_decode from "jwt-decode";
+
+import { LocalContext } from "./Context";
 
 function Copyright(props) {
   return (
@@ -44,7 +46,19 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [gAuthUser, setGAuthUser] = useState(null);
+  const [user, setUser] = useContext(LocalContext);
 
+  useEffect(() => {
+    try {
+      console.log(user);
+      if (user.admin || user.employee) {
+        if (user.admin) navigate("/dashboard");
+        else if (user.employee) navigate("/");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
   const handleChange = (e) => {
     if (e.target.name === "loginType") {
       setLoginType(e.target.value);
@@ -87,6 +101,7 @@ export default function Login() {
                   admin: true,
                 })
               );
+              setUser(JSON.parse(localStorage.getItem("user")));
               navigate("/dashboard");
             } else {
               localStorage.setItem(
@@ -97,6 +112,7 @@ export default function Login() {
                   employee: true,
                 })
               );
+              setUser(JSON.parse(localStorage.getItem("user")));
               navigate("/");
             }
           } else {
@@ -185,6 +201,7 @@ export default function Login() {
                   admin: true,
                 })
               );
+              setUser(JSON.parse(localStorage.getItem("user")));
               navigate("/dashboard");
             } else {
               localStorage.setItem(
@@ -195,6 +212,7 @@ export default function Login() {
                   employee: true,
                 })
               );
+              setUser(JSON.parse(localStorage.getItem("user")));
               navigate("/");
             }
           } else {

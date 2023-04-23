@@ -1,14 +1,15 @@
 import React from "react";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import EnhancedTable from "./EnhancedTable";
 import { useNavigate } from "react-router-dom";
-
+import { LocalContext } from "../Auth/Context";
 export const Home = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useContext(LocalContext);
   useEffect(() => {
-    let user = JSON.parse(localStorage.getItem("user"));
     try {
-      if (!user) {
+      console.log(user);
+      if (!user.admin) {
         navigate("/login");
       }
     } catch (error) {

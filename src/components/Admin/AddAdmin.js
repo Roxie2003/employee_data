@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -6,10 +6,11 @@ import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { LocalContext } from "../Auth/Context";
 
 export default function AddAdmin() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useContext(LocalContext);
   const [newAdmin, setNewAdmin] = useState({
     id: "",
     name: "",
@@ -18,10 +19,8 @@ export default function AddAdmin() {
   });
 
   useEffect(() => {
-    let localUser = JSON.parse(localStorage.getItem("user"));
-    setUser(localUser);
     try {
-      if (!localUser) {
+      if (!user.admin) {
         navigate("/login");
       }
     } catch (error) {
