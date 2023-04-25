@@ -120,6 +120,7 @@ function GenerateSalarySlipHead(props) {
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
+            sx={{ fontWeight: '700' }}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -177,8 +178,8 @@ function GenerateSalarySlipToolbar(props) {
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
+          sx={{ flex: "1 1 100%", fontWeight: 700 }}
+          variant="h5"
           id="tableTitle"
           component="div"
         >
@@ -252,7 +253,7 @@ export default function GenerateSalarySlip() {
       let URL = `https://employee-data-api.onrender.com/api/employees`;
       let data = await fetch(URL);
       let parsedData = await data.json();
-      setAllEmployee(parsedData.data);
+      setAllEmployee((parsedData.data).reverse());
     }
     fetchData();
     //eslint-disable-next-line
@@ -365,12 +366,10 @@ export default function GenerateSalarySlip() {
         total_salary: salarySlip["base_salary"] + salarySlip["overtime_pay"],
       };
       await setSalarySlipDetails(salarySlip);
-      console.log(salarySlip);
-      console.log(salarySlipDetails);
       fetch(
         "https://employee-data-api.onrender.com/api/salarySlips/" +
-          salarySlip.employee_id +
-          "/",
+        salarySlip.employee_id +
+        "/",
         {
           headers: {
             Accept: "application/json",

@@ -8,7 +8,7 @@ function Month({ employee }) {
   return (
     <Box sx={{}}>
       <Grid container padding={1} columns={{ xs: 6, sm: 12, md: 12 }}>
-        {employee["attendance"].map((att, index) => (
+        {employee["attendance"] && employee["attendance"].map((att, index) => (
           <Grid
             item
             xs={2}
@@ -30,6 +30,10 @@ function Month({ employee }) {
             </Button>
           </Grid>
         ))}
+        {
+          !(employee["attendance"]) &&
+          <span>No Record to show Please Create New Salary Slip</span>
+        }
       </Grid>
     </Box>
   );

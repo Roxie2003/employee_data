@@ -20,15 +20,11 @@ import AddIcon from "@mui/icons-material/Add";
 import Tooltip from "@mui/material/Tooltip";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
+import Modal from "../Modal";
+import CreateAdmin from "../Modals/CreateAdmin";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { visuallyHidden } from "@mui/utils";
-import { AiFillEdit } from "react-icons/ai";
-import { GrDocumentPdf } from "react-icons/gr";
 import { MdDeleteForever } from "react-icons/md";
-import Modal from "../Modal";
-import Month from "../Modals/Month";
-import EditEmployee from "../Modals/EditEmployee";
-import CreateEmployee from "../Modals/CreateEmployee";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -69,31 +65,13 @@ const headCells = [
     id: "name",
     numeric: false,
     disablePadding: true,
-    label: "Employee Name",
+    label: "Admin Name",
   },
   {
-    id: "base_salary",
+    id: "email",
     numeric: false,
     disablePadding: false,
-    label: "Base Salary",
-  },
-  {
-    id: "designation",
-    numeric: false,
-    disablePadding: false,
-    label: "Designation",
-  },
-  {
-    id: "location",
-    numeric: false,
-    disablePadding: false,
-    label: "Location",
-  },
-  {
-    id: "date_of_joining",
-    numeric: false,
-    disablePadding: false,
-    label: "Date of Joining",
+    label: "Email",
   },
   {
     id: "action",
@@ -150,7 +128,7 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-  const { numSelected, handleCreateEmployee } = props;
+  const { numSelected, handleCreateAdmin } = props;
 
   return (
     <Toolbar
@@ -182,7 +160,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Employees
+          All Admins
         </Typography>
       )}
 
@@ -193,9 +171,9 @@ function EnhancedTableToolbar(props) {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Add Employees">
+        <Tooltip title="Add Admin">
           <Fab color="primary" aria-label="add">
-            <AddIcon onClick={() => handleCreateEmployee()} />
+            <AddIcon onClick={() => handleCreateAdmin()} />
           </Fab>
         </Tooltip>
       )}
@@ -207,33 +185,27 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable() {
+export default function AllAdmin() {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [allEmployee, setAllEmployee] = useState([]);
-  const [openEditEmpModal, setOpenEditEmpModal] = useState(false);
-  const [openCreateEmpModal, setOpenCreateEmpModal] = useState(false);
-  const [openMonthModal, setOpenMonthModal] = useState(false);
-  const [employeeForModal, setEmployeeForModal] = useState({
+  const [allAdmin, setAllAdmin] = useState([]);
+  const [openCreateAdminModal, setOpenCreateAdminModal] = useState(false);
+  const [adminForModal, setAdminForModal] = useState({
     name: "",
     email: "",
-    designation: "",
-    location: "",
-    base_salary: 0,
-    date_of_joining: new Date(),
-    bank_details: { acc_no: 0, name: "", IFSC_code: 0 },
+    password: "",
   });
 
   useEffect(() => {
     async function fetchData() {
-      let URL = `https://employee-data-api.onrender.com/api/employees`;
+      let URL = `https://employee-data-api.onrender.com/api/admin`;
       let data = await fetch(URL);
       let parsedData = await data.json();
-      setAllEmployee((parsedData.data).reverse());
+      setAllAdmin((parsedData.data).reverse());
     }
     fetchData();
     //eslint-disable-next-line
@@ -241,29 +213,20 @@ export default function EnhancedTable() {
 
   function createData(
     name,
-    base_salary,
-    designation,
-    location,
-    date_of_joining,
+    email,
     actionObject
   ) {
     return {
       name,
-      base_salary,
-      designation,
-      location,
-      date_of_joining,
+      email,
       actionObject,
     };
   }
 
-  const rows = allEmployee.map((item) => {
+  const rows = allAdmin.map((item) => {
     return createData(
       item.name,
-      item.base_salary,
-      item.designation,
-      item.location,
-      item.date_of_joining,
+      item.email,
       item
     );
   });
@@ -302,54 +265,32 @@ export default function EnhancedTable() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  const handleEmpChange = (e) => {
-    setEmployeeForModal({ ...employeeForModal, [e.target.id]: e.target.value });
+  const handleAdminChange = (e) => {
+    setAdminForModal({ ...adminForModal, [e.target.id]: e.target.value });
   };
-  const handleEditEmployee = (employeeObj) => {
-    setEmployeeForModal({
+
+  const handleCreateAdmin = () => {
+    setAdminForModal({
       name: "",
       email: "",
-      designation: "",
-      location: "",
-      base_salary: 0,
-      date_of_joining: new Date(),
-      bank_details: { acc_no: 0, name: "", IFSC_code: 0 },
-      ...employeeObj
+      password: "",
     });
-    setOpenEditEmpModal(!openEditEmpModal);
+    setOpenCreateAdminModal(!openCreateAdminModal);
   };
 
-  const handleMonthModal = (employeeObj) => {
-    setEmployeeForModal(employeeObj);
-    setOpenMonthModal(!openMonthModal);
-  };
-
-  const handleCreateEmployee = () => {
-    setEmployeeForModal({
-      name: "",
-      email: "",
-      designation: "",
-      location: "",
-      base_salary: 0,
-      date_of_joining: new Date(),
-      bank_details: { acc_no: 0, name: "", IFSC_code: 0 },
-    });
-    setOpenCreateEmpModal(!openCreateEmpModal);
-  };
-
-  const handleDeleteEmployee = (employeeObj) => {
+  const handleDeleteAdmin = (AdminObj) => {
     fetch(
-      "https://employee-data-api.onrender.com/api/employees/" + employeeObj._id,
+      "https://employee-data-api.onrender.com/api/admin/" + AdminObj._id,
       {
         method: "DELETE",
       }
     )
       .then((res) => res.json())
       .then((data) => {
-        setAllEmployee(
-          allEmployee.filter((emp) => emp._id !== employeeObj._id)
+        setAllAdmin(
+          allAdmin.filter((emp) => emp._id !== AdminObj._id)
         );
-        toast.success("Employee Deleted Sucessfully!", {
+        toast.success("Admin Deleted Sucessfully!", {
           position: "top-center",
           autoClose: 3000,
           hideProgressBar: false,
@@ -362,41 +303,8 @@ export default function EnhancedTable() {
       .catch((error) => console.error(error));
   };
 
-  const handleEditEmployeeSave = (employeeObj) => {
-    fetch(
-      "https://employee-data-api.onrender.com/api/employees/" + employeeObj._id,
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        method: "PATCH",
-
-        // Fields that to be updated are passed
-        body: JSON.stringify(employeeObj),
-      }
-    )
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        toast.success("Employee Updated Sucessfully!", {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-        setTimeout(() => {
-          window.location.reload(false);
-        }, 1000);
-      });
-  };
-
-  const handleCreateEmployeeNew = (employeeObj) => {
-    fetch("https://employee-data-api.onrender.com/api/employees/", {
+  const handleCreateAdminNew = (AdminObj) => {
+    fetch("https://employee-data-api.onrender.com/api/admin/", {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -404,14 +312,14 @@ export default function EnhancedTable() {
       method: "POST",
 
       // Fields that to be updated are passed
-      body: JSON.stringify(employeeObj),
+      body: JSON.stringify(AdminObj),
     })
       .then(function (response) {
         return response.json();
       })
       .then(function (data) {
         if(data.success){
-          toast.success("Employee Created Sucessfully!", {
+          toast.success("Admin Created Sucessfully!", {
             position: "top-center",
             autoClose: 3000,
             hideProgressBar: false,
@@ -445,13 +353,12 @@ export default function EnhancedTable() {
   };
 
   const closeModal = () => {
-    setEmployeeForModal({});
-    setOpenEditEmpModal(false);
-    setOpenMonthModal(false);
-    setOpenCreateEmpModal(false);
+    setAdminForModal({});
+    setOpenCreateAdminModal(false);
   };
+
   return (
-    <div>
+    <div className="p-4 md:p-10">
       <ToastContainer
         position="top-center"
         autoClose={3000}
@@ -463,51 +370,26 @@ export default function EnhancedTable() {
         draggable
         pauseOnHover
       />
-      {openMonthModal && (
+      {openCreateAdminModal && (
         <Modal
-          title="Select Month for Salary"
-          children={<Month employee={employeeForModal} />}
-          onClose={closeModal}
-          showModal={openMonthModal}
-          maxWidth="xs"
-        />
-      )}
-      {openEditEmpModal && (
-        <Modal
-          title="Edit Employee Info"
-          endTitle="Save Changes"
-          handleSubmit={() => handleEditEmployeeSave(employeeForModal)}
+          title="Create New Admin"
+          endTitle="Create Admin"
+          handleSubmit={() => handleCreateAdminNew(adminForModal)}
           children={
-            <EditEmployee
-              employee={employeeForModal}
-              onFieldChange={handleEmpChange}
+            <CreateAdmin
+              admin={adminForModal}
+              onFieldChange={handleAdminChange}
             />
           }
           onClose={closeModal}
-          showModal={openEditEmpModal}
-          hasfooter={"true"}
-        />
-      )}
-      {openCreateEmpModal && (
-        <Modal
-          title="Create New Employee"
-          endTitle="Create Employee"
-          handleSubmit={() => handleCreateEmployeeNew(employeeForModal)}
-          children={
-            <CreateEmployee
-              employee={employeeForModal}
-              onFieldChange={handleEmpChange}
-            />
-          }
-          onClose={closeModal}
-          showModal={openCreateEmpModal}
+          showModal={openCreateAdminModal}
           hasfooter={"true"}
         />
       )}
 
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
-          <EnhancedTableToolbar numSelected={selected.length} handleCreateEmployee={handleCreateEmployee} />
+          <EnhancedTableToolbar numSelected={selected.length} handleCreateAdmin={handleCreateAdmin} />
           <TableContainer>
             <Table
               sx={{ minWidth: 750 }}
@@ -547,33 +429,18 @@ export default function EnhancedTable() {
                         >
                           {row.name}
                         </TableCell>
-                        <TableCell>{row.base_salary}</TableCell>
-                        <TableCell>{row.designation}</TableCell>
-                        <TableCell>{row.location}</TableCell>
-                        <TableCell>
-                          {new Date(row.date_of_joining).toDateString()}
-                        </TableCell>
+                        <TableCell>{row.email}</TableCell>
                         <TableCell>
                           <div className="flex space-x-4 text-xl">
-                            <AiFillEdit
-                              onClick={() =>
-                                handleEditEmployee(row.actionObject)
-                              }
-                              className="cursor-pointer"
-                            />
                             <MdDeleteForever
                               className="cursor-pointer"
                               onClick={() =>
                                 window.confirm(
-                                  "Do you want to delete this employee?"
+                                  "Do you want to delete this Admin?"
                                 ) === true
-                                  ? handleDeleteEmployee(row.actionObject)
+                                  ? handleDeleteAdmin(row.actionObject)
                                   : ""
                               }
-                            />
-                            <GrDocumentPdf
-                              className="cursor-pointer"
-                              onClick={() => handleMonthModal(row.actionObject)}
                             />
                           </div>
                         </TableCell>

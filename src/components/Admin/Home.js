@@ -8,7 +8,6 @@ export const Home = () => {
   const [user, setUser] = useContext(LocalContext);
   useEffect(() => {
     try {
-      console.log(user);
       if (!user.admin) {
         navigate("/login");
       }

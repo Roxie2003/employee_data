@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
-
 import Button from "@mui/material/Button";
 import Invoice from "../Modals/Invoice";
 
 export const PaySlip = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { employee, month_year } = location.state;
-
   const [employeeWithAtt, setEmployeeWithAtt] = useState({});
   const [salarySlipDetails, setSalarySlipDetails] = useState({});
   const [showSalarySlip, setShowSalarySlip] = useState(false);
+
   useEffect(() => {
     checkIfSalarySlipExists();
     // eslint-disable-next-line
@@ -88,7 +88,7 @@ export const PaySlip = () => {
         setShowSalarySlip(true);
       });
   };
-  const navigate = useNavigate();
+
   return (
     <div align="center">
       <div>

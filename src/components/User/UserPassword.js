@@ -49,7 +49,6 @@ export default function UserPassword() {
       ...employeePasses,
       [e.target.id]: e.target.value,
     });
-    console.log(employeePasses);
   };
 
   const handleSubmit = (e) => {
@@ -72,7 +71,6 @@ export default function UserPassword() {
         return response.json();
       })
       .then(function (data) {
-        console.log(data);
         toast.success("Password Updated Sucessfully!", {
           position: "top-center",
           autoClose: 3000,

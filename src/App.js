@@ -1,4 +1,3 @@
-import { useState, useEffect, useContext } from "react";
 import Navbar from "./components/Navbar";
 import { Home } from "./components/Admin/Home";
 import { PaySlip } from "./components/Admin/PaySlip";
@@ -12,6 +11,7 @@ import UserDashboard from "./components/User/UserDashboard";
 import UserPassword from "./components/User/UserPassword";
 import GenerateSalarySlip from "./components/Admin/GenerateSalarySlip";
 import { LocalProvider } from "./components/Auth/Context";
+import AllAdmin from "./components/Admin/AllAdmin";
 function App() {
   return (
     <>
@@ -33,6 +33,7 @@ function App() {
             path="/generateSalarySlip"
             element={<GenerateSalarySlip />}
           ></Route>
+          <Route path="/allAdmin" element={<AllAdmin />}></Route>
           <Route path="/addAdmin" element={<AddAdmin />}></Route>
           <Route path="/paySlip" element={<PaySlip />}></Route>
           <Route path="/salarySlip" element={<SalarySlipTable />}></Route>

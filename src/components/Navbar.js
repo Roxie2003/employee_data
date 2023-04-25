@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect, useContext } from "react";
+import { useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -27,11 +27,7 @@ function Navbar() {
     "Edit Password",
     "Logout",
   ];
-  const adminSettings = ["Dashboard", "Add Admin", "Logout"];
-
-  useEffect(() => {
-    //eslint-disable-next-line
-  }, []);
+  const adminSettings = ["Dashboard", "All Admin", "Logout"];
 
   const settingsRedirect = (setting) => {
     if (setting === "Dashboard") {
@@ -48,6 +44,8 @@ function Navbar() {
   const adminSettingsRedirect = (setting) => {
     if (setting === "Dashboard") {
       return "/dashboard";
+    } else if (setting === "All Admin") {
+      return "/allAdmin";
     } else if (setting === "Add Admin") {
       return "/addAdmin";
     } else if (setting === "Logout") {
@@ -60,7 +58,7 @@ function Navbar() {
     localStorage.clear();
   };
 
-  const blankFunc = () => {};
+  const blankFunc = () => { };
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -82,36 +80,38 @@ function Navbar() {
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <Box sx={{ flexGrow: 0, display: { xs: "flex", md: "none" } }}>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-                open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
-                sx={{
-                  display: { xs: "block", md: "none" },
-                }}
-              >
-                {user && user.admin && (
+            {
+              user && user.admin &&
+              <Box sx={{ flexGrow: 0, display: { xs: "flex", md: "none" } }}>
+                <IconButton
+                  size="large"
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleOpenNavMenu}
+                  color="inherit"
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorElNav}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "left",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "left",
+                  }}
+                  open={Boolean(anchorElNav)}
+                  onClose={handleCloseNavMenu}
+                  sx={{
+                    display: { xs: "block", md: "none" },
+                  }}
+                >
+
                   <div>
                     <MenuItem
                       key={adminPages[0]}
@@ -153,18 +153,10 @@ function Navbar() {
                       </NavLink>
                     </MenuItem>
                   </div>
-                )}
-                {user &&
-                  user.employee &&
-                  employeePages.map((page) => (
-                    <MenuItem key={page} onClick={handleCloseNavMenu}>
-                      <NavLink to="">
-                        <Typography textAlign="center">{page}</Typography>
-                      </NavLink>
-                    </MenuItem>
-                  ))}
-              </Menu>
-            </Box>
+
+                </Menu>
+              </Box>
+            }
 
             <img
               src="./logo.png"

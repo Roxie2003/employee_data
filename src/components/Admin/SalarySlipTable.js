@@ -28,6 +28,7 @@ import { GrView } from "react-icons/gr";
 import Invoice from "../Modals/Invoice";
 import { useNavigate } from "react-router-dom";
 import { LocalContext } from "../Auth/Context";
+
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -115,6 +116,7 @@ function EnhancedTableHead(props) {
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
+            sx={{ fontWeight: '700' }}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -172,8 +174,8 @@ function EnhancedTableToolbar(props) {
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
+          sx={{ flex: "1 1 100%", fontWeight: 700 }}
+          variant="h5"
           id="tableTitle"
           component="div"
         >
@@ -228,7 +230,7 @@ export default function EnhancedTable() {
       let URL = `https://employee-data-api.onrender.com/api/salarySlips/`;
       let data = await fetch(URL);
       let parsedData = await data.json();
-      setAllEmployee(parsedData.data);
+      setAllEmployee((parsedData.data).reverse());
     }
     fetchData();
     //eslint-disable-next-line
@@ -300,7 +302,7 @@ export default function EnhancedTable() {
   const handleDeleteSalarySlip = (salarySlipObj) => {
     fetch(
       "https://employee-data-api.onrender.com/api/salarySlips/" +
-        salarySlipObj._id,
+      salarySlipObj._id,
       {
         method: "DELETE",
       }

@@ -51,7 +51,6 @@ export default function AddAdmin() {
         return response.json();
       })
       .then(function (data) {
-        console.log(data);
         toast.success("Admin Created Sucessfully!", {
           position: "top-center",
           autoClose: 3000,

@@ -45,19 +45,20 @@ export default function Login() {
   const [loginType, setLoginType] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // eslint-disable-next-line
   const [gAuthUser, setGAuthUser] = useState(null);
   const [user, setUser] = useContext(LocalContext);
 
   useEffect(() => {
     try {
-      console.log(user);
       if (user.admin || user.employee) {
         if (user.admin) navigate("/dashboard");
         else if (user.employee) navigate("/");
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
+    // eslint-disable-next-line
   }, []);
   const handleChange = (e) => {
     if (e.target.name === "loginType") {
@@ -90,7 +91,6 @@ export default function Login() {
           return response.json();
         })
         .then(function (data) {
-          console.log(data);
           if (data.sucess) {
             if (loginType === "admin") {
               localStorage.setItem(

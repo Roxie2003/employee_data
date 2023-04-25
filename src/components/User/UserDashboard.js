@@ -124,6 +124,7 @@ function EnhancedTableHead(props) {
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
+            sx={{ fontWeight: '700' }}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -172,17 +173,17 @@ function EnhancedTableToolbar(props) {
     >
       {numSelected > 0 ? (
         <Typography
-          sx={{ flex: "1 1 100%" }}
-          color="inherit"
-          variant="subtitle1"
+          sx={{ flex: "1 1 100%", fontWeight: 700 }}
+          variant="h5"
+          id="tableTitle"
           component="div"
         >
           {numSelected} selected
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
+          sx={{ flex: "1 1 100%", fontWeight: 700 }}
+          variant="h5"
           id="tableTitle"
           component="div"
         >
