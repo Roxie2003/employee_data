@@ -1,6 +1,5 @@
 import Navbar from "./components/Navbar";
 import { Home } from "./components/Admin/Home";
-import { PaySlip } from "./components/Admin/PaySlip";
 import AddAdmin from "./components/Admin/AddAdmin";
 import { Routes, Route } from "react-router-dom";
 import SalarySlipTable from "./components/Admin/SalarySlipTable";

@@ -125,6 +125,7 @@ function EditSalarySlip({ employee, month_year, onClose, showmodal }) {
   };
 
   useEffect(() => {
+    console.log("Hiii");
     salarySlipExists(employee);
   }, []);
 
