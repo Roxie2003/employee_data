@@ -218,6 +218,7 @@ export default function EnhancedTable() {
   const [openEditEmpModal, setOpenEditEmpModal] = useState(false);
   const [openCreateEmpModal, setOpenCreateEmpModal] = useState(false);
   const [openMonthModal, setOpenMonthModal] = useState(false);
+  const [rerenderComponent, setRerenderComponent] = useState(false);
   const [employeeForModal, setEmployeeForModal] = useState({
     name: "",
     email: "",
@@ -237,7 +238,7 @@ export default function EnhancedTable() {
     }
     fetchData();
     //eslint-disable-next-line
-  }, []);
+  }, [rerenderComponent]);
 
   function createData(
     name,
@@ -362,7 +363,8 @@ export default function EnhancedTable() {
       .catch((error) => console.error(error));
   };
 
-  const handleEditEmployeeSave = (employeeObj) => {
+  const handleEditEmployeeSave = (e, employeeObj) => {
+    e.preventDefault();
     fetch(
       "https://employee-data-api.onrender.com/api/employees/" + employeeObj._id,
       {
@@ -389,13 +391,13 @@ export default function EnhancedTable() {
           draggable: true,
           progress: undefined,
         });
-        setTimeout(() => {
-          window.location.reload(false);
-        }, 1000);
+        setRerenderComponent(!rerenderComponent);
+        closeModal();
       });
   };
 
-  const handleCreateEmployeeNew = (employeeObj) => {
+  const handleCreateEmployeeNew = (e, employeeObj) => {
+    e.preventDefault();
     fetch("https://employee-data-api.onrender.com/api/employees/", {
       headers: {
         Accept: "application/json",
@@ -410,7 +412,7 @@ export default function EnhancedTable() {
         return response.json();
       })
       .then(function (data) {
-        if(data.success){
+        if (data.sucess) {
           toast.success("Employee Created Sucessfully!", {
             position: "top-center",
             autoClose: 3000,
@@ -420,11 +422,10 @@ export default function EnhancedTable() {
             draggable: true,
             progress: undefined,
           });
-          setTimeout(() => {
-            window.location.reload(false);
-          }, 1000);
+          setRerenderComponent(!rerenderComponent);
+          closeModal();
         }
-        else{
+        else {
           toast.error(data.error, {
             position: "top-center",
             autoClose: 3000,
@@ -436,7 +437,7 @@ export default function EnhancedTable() {
           });
           setTimeout(() => {
             window.location.reload(false);
-          }, 1000);
+          }, 2000);
         }
       })
       .catch((err) => {
@@ -476,7 +477,7 @@ export default function EnhancedTable() {
         <Modal
           title="Edit Employee Info"
           endTitle="Save Changes"
-          handleSubmit={() => handleEditEmployeeSave(employeeForModal)}
+          handleSubmit={(e) => handleEditEmployeeSave(e, employeeForModal)}
           children={
             <EditEmployee
               employee={employeeForModal}
@@ -492,7 +493,7 @@ export default function EnhancedTable() {
         <Modal
           title="Create New Employee"
           endTitle="Create Employee"
-          handleSubmit={() => handleCreateEmployeeNew(employeeForModal)}
+          handleSubmit={(e) => handleCreateEmployeeNew(e, employeeForModal)}
           children={
             <CreateEmployee
               employee={employeeForModal}

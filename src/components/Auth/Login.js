@@ -17,7 +17,6 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jwt_decode from "jwt-decode";
-
 import { LocalContext } from "./Context";
 
 function Copyright(props) {
@@ -47,6 +46,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   // eslint-disable-next-line
   const [gAuthUser, setGAuthUser] = useState(null);
+  // eslint-disable-next-line
   const [user, setUser] = useContext(LocalContext);
 
   useEffect(() => {
@@ -265,7 +265,6 @@ export default function Login() {
           <Box
             component="form"
             onSubmit={handleSubmit}
-            noValidate
             sx={{ mt: 1 }}
           >
             <InputLabel id="demo-simple-select-label">Login Type</InputLabel>

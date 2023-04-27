@@ -10,6 +10,7 @@ import { LocalContext } from "../Auth/Context";
 
 export default function AddAdmin() {
   const navigate = useNavigate();
+  // eslint-disable-next-line
   const [user, setUser] = useContext(LocalContext);
   const [newAdmin, setNewAdmin] = useState({
     id: "",
@@ -26,6 +27,7 @@ export default function AddAdmin() {
     } catch (error) {
       console.error(error);
     }
+    // eslint-disable-next-line
   }, []);
 
   const handleChange = (e) => {
@@ -89,10 +91,10 @@ export default function AddAdmin() {
       />
       <Box
         component="form"
-        noValidate
         autoComplete="off"
         maxWidth="lg"
         className=""
+        onSubmit={handleSubmit}
       >
         <h3 className="m-1 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
           New Admin
@@ -138,7 +140,7 @@ export default function AddAdmin() {
           </Grid>
         </Grid>
         <div className="flex justify-center my-2">
-          <Button variant="contained" onClick={handleSubmit}>
+          <Button variant="contained" type="submit">
             Save changes
           </Button>
         </div>

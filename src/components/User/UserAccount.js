@@ -11,8 +11,10 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { LocalContext } from "../Auth/Context";
+
 export default function UserAccount() {
   const navigate = useNavigate();
+  // eslint-disable-next-line
   const [user, setUser] = useContext(LocalContext);
 
   const [employee, setEmployee] = useState({
@@ -108,12 +110,14 @@ export default function UserAccount() {
           draggable: true,
           progress: undefined,
         });
-        navigate("/");
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
       });
   };
 
   return (
-    <div className="flex justify-center mt-8">
+    <div className="p-4 md:p-10 flex justify-center">
       <ToastContainer
         position="top-center"
         autoClose={3000}
@@ -127,10 +131,10 @@ export default function UserAccount() {
       />
       <Box
         component="form"
-        noValidate
         autoComplete="off"
         maxWidth="lg"
         className=""
+        onSubmit={handleSubmit}
       >
         <h3 className="m-1 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
           My Account - Personal Details
@@ -258,7 +262,7 @@ export default function UserAccount() {
           </Grid>
         </Grid>
         <div className="flex justify-center my-2">
-          <Button variant="contained" onClick={handleSubmit}>
+          <Button variant="contained" type='submit'>
             Save changes
           </Button>
         </div>

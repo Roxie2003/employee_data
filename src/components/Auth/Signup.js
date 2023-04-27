@@ -15,6 +15,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jwt_decode from "jwt-decode";
 import { LocalContext } from "./Context";
+
 function Copyright(props) {
   return (
     <Typography
@@ -37,8 +38,8 @@ const theme = createTheme();
 
 export default function Signup() {
   const navigate = useNavigate();
+  // eslint-disable-next-line
   const [user, setUser] = useContext(LocalContext);
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -210,7 +211,6 @@ export default function Signup() {
           </Typography>
           <Box
             component="form"
-            noValidate
             onSubmit={handleSubmit}
             sx={{ mt: 3 }}
           >
@@ -252,28 +252,6 @@ export default function Signup() {
                   autoComplete="email"
                 />
               </Grid>
-              {/* <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="location"
-                  label="Location"
-                  type="text"
-                  id="location"
-                  autoComplete="location"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="designation"
-                  label="Designation"
-                  type="text"
-                  id="designation"
-                  autoComplete="designation"
-                />
-              </Grid> */}
               <Grid item xs={12}>
                 <TextField
                   required

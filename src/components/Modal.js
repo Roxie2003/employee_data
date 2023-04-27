@@ -8,7 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -78,12 +78,15 @@ export default function CustomizedDialogs(props) {
         pauseOnHover
       />
       <BootstrapDialog
+        component="form"
+        autoComplete="off"
         children={title}
         onClose={onClose}
         aria-labelledby="customized-dialog-title"
         open={showModal}
         fullWidth
         {...other}
+        onSubmit={handleSubmit}
       >
         <BootstrapDialogTitle
           id="customized-dialog-title"
@@ -91,14 +94,14 @@ export default function CustomizedDialogs(props) {
         >
           {title}
         </BootstrapDialogTitle>
-        <DialogContent dividers>{children}</DialogContent>
-        {other.hasfooter === "true" && (
-          <DialogActions>
-            <Button autoFocus variant="contained" onClick={handleSubmit}>
-              {endTitle}
-            </Button>
-          </DialogActions>
-        )}
+          <DialogContent dividers>{children}</DialogContent>
+          {other.hasfooter === "true" && (
+            <DialogActions>
+              <Button variant="contained" type="submit" >
+                {endTitle}
+              </Button>
+            </DialogActions>
+          )}
       </BootstrapDialog>
     </div>
   );

@@ -3,9 +3,12 @@ import { useEffect, useContext } from "react";
 import EnhancedTable from "./EnhancedTable";
 import { useNavigate } from "react-router-dom";
 import { LocalContext } from "../Auth/Context";
+
 export const Home = () => {
   const navigate = useNavigate();
+  // eslint-disable-next-line
   const [user, setUser] = useContext(LocalContext);
+
   useEffect(() => {
     try {
       if (!user.admin) {
@@ -16,6 +19,7 @@ export const Home = () => {
     }
     //eslint-disable-next-line
   }, []);
+  
   return (
     <div className="p-4 md:p-10">
       <EnhancedTable />

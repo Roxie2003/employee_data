@@ -5,7 +5,7 @@ import Grid from "@mui/material/Grid";
 
 function CreateAdmin({ admin, onFieldChange }) {
   return (
-    <Box component="form" noValidate autoComplete="off">
+    <Box component="div">
       <h3 className="m-1 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
         Admin Details
       </h3>

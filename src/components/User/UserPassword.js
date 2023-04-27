@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { LocalContext } from "../Auth/Context";
 export default function UserPassword() {
   const navigate = useNavigate();
+  // eslint-disable-next-line
   const [user, setUser] = useContext(LocalContext);
   const [employeePasses, setEmployeePasses] = useState({
     id: "",
@@ -53,35 +54,50 @@ export default function UserPassword() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch(
-      "https://employee-data-api.onrender.com/api/employees/changePassword/" +
+    if (employeePasses.new_password === employeePasses.confirm_password) {
+      fetch(
+        "https://employee-data-api.onrender.com/api/employees/changePassword/" +
         employeePasses._id,
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        method: "PATCH",
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "PATCH",
 
-        // Fields that to be updated are passed
-        body: JSON.stringify(employeePasses),
-      }
-    )
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        toast.success("Password Updated Sucessfully!", {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
+          // Fields that to be updated are passed
+          body: JSON.stringify(employeePasses),
+        }
+      )
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          toast.success("Password Updated Sucessfully!", {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          setTimeout(() => {
+            navigate("/");
+          }, 2000);
         });
-        navigate("/");
+    }
+    else{
+      toast.error("Password did not match!", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
+    }
   };
 
   return (
@@ -99,12 +115,11 @@ export default function UserPassword() {
       />
       <Box
         component="form"
-        noValidate
         autoComplete="off"
         maxWidth="lg"
         className=""
+        onSubmit={handleSubmit}
       >
-        {}
         <h3 className="m-1 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
           Change Password
         </h3>
@@ -150,7 +165,7 @@ export default function UserPassword() {
         </Grid>
 
         <div className="flex justify-center my-2">
-          <Button variant="contained" onClick={handleSubmit}>
+          <Button variant="contained" type="submit">
             Save changes
           </Button>
         </div>

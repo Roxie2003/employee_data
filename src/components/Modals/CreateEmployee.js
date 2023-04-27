@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -27,7 +26,7 @@ function CreateEmployee({ employee, onFieldChange }) {
     });
   };
   return (
-    <Box component="form" noValidate autoComplete="off">
+    <Box component="div">
       <h3 className="m-1 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
         Employee Details
       </h3>

@@ -194,6 +194,7 @@ export default function AllAdmin() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [allAdmin, setAllAdmin] = useState([]);
   const [openCreateAdminModal, setOpenCreateAdminModal] = useState(false);
+  const [rerenderComponent, setRerenderComponent] = useState(false);
   const [adminForModal, setAdminForModal] = useState({
     name: "",
     email: "",
@@ -209,7 +210,7 @@ export default function AllAdmin() {
     }
     fetchData();
     //eslint-disable-next-line
-  }, []);
+  }, [rerenderComponent]);
 
   function createData(
     name,
@@ -303,7 +304,8 @@ export default function AllAdmin() {
       .catch((error) => console.error(error));
   };
 
-  const handleCreateAdminNew = (AdminObj) => {
+  const handleCreateAdminNew = (e,AdminObj) => {
+    e.preventDefault();
     fetch("https://employee-data-api.onrender.com/api/admin/", {
       headers: {
         Accept: "application/json",
@@ -318,7 +320,7 @@ export default function AllAdmin() {
         return response.json();
       })
       .then(function (data) {
-        if(data.success){
+        if(data.sucess){
           toast.success("Admin Created Sucessfully!", {
             position: "top-center",
             autoClose: 3000,
@@ -328,9 +330,8 @@ export default function AllAdmin() {
             draggable: true,
             progress: undefined,
           });
-          setTimeout(() => {
-            window.location.reload(false);
-          }, 1000);
+          setRerenderComponent(!rerenderComponent);
+          closeModal();
         }
         else{
           toast.error(data.error, {
@@ -342,9 +343,8 @@ export default function AllAdmin() {
             draggable: true,
             progress: undefined,
           });
-          setTimeout(() => {
-            window.location.reload(false);
-          }, 1000);
+          setRerenderComponent(!rerenderComponent);
+          closeModal();
         }
       })
       .catch((err) => {
@@ -374,7 +374,7 @@ export default function AllAdmin() {
         <Modal
           title="Create New Admin"
           endTitle="Create Admin"
-          handleSubmit={() => handleCreateAdminNew(adminForModal)}
+          handleSubmit={(e) => handleCreateAdminNew(e,adminForModal)}
           children={
             <CreateAdmin
               admin={adminForModal}

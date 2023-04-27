@@ -25,6 +25,7 @@ import { GrView } from "react-icons/gr";
 import Invoice from "../Modals/Invoice";
 import { useNavigate } from "react-router-dom";
 import { LocalContext } from "../Auth/Context";
+
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -214,6 +215,7 @@ EnhancedTableToolbar.propTypes = {
 
 export default function UserDashboard() {
   const navigate = useNavigate();
+  // eslint-disable-next-line
   const [user, setUser] = useContext(LocalContext);
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
