@@ -24,7 +24,6 @@ import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
-import Invoice from "../Modals/Invoice";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import InputLabel from "@mui/material/InputLabel";
@@ -32,6 +31,8 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import "react-toastify/dist/ReactToastify.css";
 import { LocalContext } from "../Auth/Context";
+import EditSalarySlip from "./EditSalarySlip";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -120,7 +121,7 @@ function GenerateSalarySlipHead(props) {
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
-            sx={{ fontWeight: '700' }}
+            sx={{ fontWeight: "700" }}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -209,7 +210,7 @@ GenerateSalarySlipToolbar.propTypes = {
 };
 
 export default function GenerateSalarySlip() {
-  // eslint-disable-next-line
+  const [rows, setRows] = useState([]);
   const [user, setUser] = useContext(LocalContext);
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
@@ -218,8 +219,8 @@ export default function GenerateSalarySlip() {
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [allEmployee, setAllEmployee] = useState([]);
-  const [salarySlipDetails, setSalarySlipDetails] = useState({});
-  const [showSalarySlip, setShowSalarySlip] = useState(false);
+  const [employeeForSlip, setEmployeeForSlip] = useState({});
+  const [openEditPaySlipModal, setOpenEditPaySlipModal] = useState(false);
   const months = [
     "Jan",
     "Feb",
@@ -237,10 +238,9 @@ export default function GenerateSalarySlip() {
   const range = (min, max) =>
     [...Array(max - min + 1).keys()].map((i) => i + min);
   const years = range(2022, new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(
-    months[new Date().getMonth()]
-  );
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() - 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     try {
@@ -254,7 +254,19 @@ export default function GenerateSalarySlip() {
       let URL = `https://employee-data-api.onrender.com/api/employees`;
       let data = await fetch(URL);
       let parsedData = await data.json();
-      setAllEmployee((parsedData.data).reverse());
+      await setAllEmployee(
+        parsedData.data.reverse().map((item) => {
+          return createData(
+            item.name,
+            item.base_salary,
+            item.designation,
+            item.location,
+            item.date_of_joining,
+            item
+          );
+        })
+      );
+      setLoading(false);
     }
     fetchData();
     //eslint-disable-next-line
@@ -278,16 +290,17 @@ export default function GenerateSalarySlip() {
     };
   }
 
-  const rows = allEmployee.map((item) => {
-    return createData(
-      item.name,
-      item.base_salary,
-      item.designation,
-      item.location,
-      item.date_of_joining,
-      item
-    );
-  });
+  useEffect(() => {
+    setRows([
+      ...allEmployee.filter((emp) => {
+        let dt = new Date(emp.date_of_joining);
+        return (
+          dt.getFullYear() < selectedYear ||
+          (dt.getMonth() <= selectedMonth && dt.getFullYear() <= selectedYear)
+        );
+      }),
+    ]);
+  }, [selectedMonth, selectedYear, allEmployee]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -323,92 +336,14 @@ export default function GenerateSalarySlip() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  const salarySlipExists = async (employee) => {
-    let URL =
-      `https://employee-data-api.onrender.com/api/salarySlips/` +
-      employee.id +
-      "/" +
-      selectedMonth +
-      "-" +
-      selectedYear +
-      "/";
-    let data = await fetch(URL);
-    let parsedData = await data.json();
-    //check if already generated
-    if (parsedData.data) {
-      toast.success("Salary Slip Already Exist!", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      setSalarySlipDetails(parsedData.data);
-    } else {
-      const employeeObj = await {
-        ...employee,
-        income_tax: 0,
-        attendance: {
-          ...employee["attendance"].filter(
-            (att) => att.month_year === selectedMonth + "-" + selectedYear
-          )[0],
-        },
-      };
-      let { id, _id, ...salarySlip } = await employeeObj;
-      salarySlip = await {
-        ...salarySlip,
-        overtime_pay: salarySlip["attendance"].overtime_hrs * 500,
-        employee_id: id,
-      };
-      salarySlip = await {
-        ...salarySlip,
-        total_salary: salarySlip["base_salary"] + salarySlip["overtime_pay"],
-      };
-      await setSalarySlipDetails(salarySlip);
-      fetch(
-        "https://employee-data-api.onrender.com/api/salarySlips/" +
-        salarySlip.employee_id +
-        "/",
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-
-          // Fields that to be updated are passed
-          body: JSON.stringify(salarySlip),
-        }
-      )
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          toast.success("Salary Slip Generated Sucessfully!", {
-            position: "top-center",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-  };
-
-  const handleGeneratePaySlip = async (employee) => {
+  const handleGenerateButton = (e, employee) => {
+    e.preventDefault();
     if (
       !employee.attendance.filter(
-        (att) => att.month_year === selectedMonth + "-" + selectedYear
+        (att) => att.month_year === months[selectedMonth] + "-" + selectedYear
       )[0]
     ) {
-      toast.error("Attendance is not present", {
+      toast.error("Record not present", {
         position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
@@ -418,8 +353,9 @@ export default function GenerateSalarySlip() {
         progress: undefined,
       });
     } else {
-      await salarySlipExists(employee);
-      setShowSalarySlip(true);
+      setEmployeeForSlip(employee);
+      setOpenEditPaySlipModal(true);
+      // await salarySlipExists(employee);
     }
   };
 
@@ -436,6 +372,16 @@ export default function GenerateSalarySlip() {
   }, []);
   return (
     <div className="p-4 md:p-10">
+      {openEditPaySlipModal && (
+        <div>
+          <EditSalarySlip
+            employee={employeeForSlip}
+            month_year={months[selectedMonth] + "-" + selectedYear}
+            onClose={() => setOpenEditPaySlipModal(false)}
+            showmodal={openEditPaySlipModal}
+          />
+        </div>
+      )}
       <div>
         <ToastContainer
           position="top-center"
@@ -448,17 +394,6 @@ export default function GenerateSalarySlip() {
           draggable
           pauseOnHover
         />
-        <div>
-          {showSalarySlip && salarySlipDetails.attendance && (
-            <Invoice
-              salarySlipDetails={salarySlipDetails}
-              handleOnClose={() => {
-                setSalarySlipDetails({});
-                setShowSalarySlip(false);
-              }}
-            ></Invoice>
-          )}
-        </div>
 
         <Box sx={{ width: "100%" }}>
           <Box
@@ -480,11 +415,16 @@ export default function GenerateSalarySlip() {
                 autoFocus
                 value={selectedMonth}
                 onChange={(e) => {
-                  setSelectedMonth(e.target.value);
+                  if (
+                    new Date().getFullYear() > selectedYear ||
+                    (new Date().getMonth() > e.target.value &&
+                      new Date().getFullYear() === selectedYear)
+                  )
+                    setSelectedMonth(e.target.value);
                 }}
               >
-                {months.map((month) => (
-                  <MenuItem value={month} key={month}>
+                {months.map((month, index) => (
+                  <MenuItem value={index} key={month}>
                     {month}
                   </MenuItem>
                 ))}
@@ -562,8 +502,9 @@ export default function GenerateSalarySlip() {
                               <Button
                                 variant="contained"
                                 color="success"
-                                onClick={() =>
-                                  handleGeneratePaySlip(row.actionObject)
+                                type="none"
+                                onClick={(e) =>
+                                  handleGenerateButton(e, row.actionObject)
                                 }
                               >
                                 Generate
@@ -585,6 +526,11 @@ export default function GenerateSalarySlip() {
                 </TableBody>
               </Table>
             </TableContainer>
+            {loading && (
+              <div className="flex justify-center mt-5">
+                <CircularProgress />
+              </div>
+            )}
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
@@ -595,6 +541,7 @@ export default function GenerateSalarySlip() {
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </Paper>
+
           <FormControlLabel
             control={<Switch checked={dense} onChange={handleChangeDense} />}
             label="Dense padding"

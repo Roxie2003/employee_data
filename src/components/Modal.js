@@ -48,61 +48,57 @@ CustomizedDialogs.propTypes = {
   title: PropTypes.string,
   children: PropTypes.node,
   onClose: PropTypes.func.isRequired,
-  Modal: PropTypes.bool,
+  showmodal: PropTypes.bool,
   hasfooter: PropTypes.string,
   endTitle: PropTypes.string,
 };
 
 export default function CustomizedDialogs(props) {
-  const {
-    title,
-    children,
-    onClose,
-    showModal,
-    endTitle,
-    handleSubmit,
-    ...other
-  } = props;
+  const { title, children, onClose, endTitle, handleSubmit, ...other } = props;
 
   return (
     <div>
-      <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-      <BootstrapDialog
-        component="form"
-        autoComplete="off"
-        children={title}
-        onClose={onClose}
-        aria-labelledby="customized-dialog-title"
-        open={showModal}
-        fullWidth
-        {...other}
-        onSubmit={handleSubmit}
-      >
-        <BootstrapDialogTitle
-          id="customized-dialog-title"
-          handleClose={onClose}
-        >
-          {title}
-        </BootstrapDialogTitle>
-          <DialogContent dividers>{children}</DialogContent>
-          {other.hasfooter === "true" && (
-            <DialogActions>
-              <Button variant="contained" type="submit" >
-                {endTitle}
-              </Button>
-            </DialogActions>
-          )}
-      </BootstrapDialog>
+      {children && (
+        <div>
+          <ToastContainer
+            position="top-center"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
+          <BootstrapDialog
+            component="form"
+            autoComplete="off"
+            children={title}
+            onClose={onClose}
+            aria-labelledby="customized-dialog-title"
+            open={other.showmodal}
+            fullWidth
+            {...other}
+            onSubmit={handleSubmit}
+          >
+            <BootstrapDialogTitle
+              id="customized-dialog-title"
+              handleClose={onClose}
+            >
+              {title}
+            </BootstrapDialogTitle>
+            <DialogContent dividers>{children}</DialogContent>
+            {other.hasfooter === "true" && (
+              <DialogActions>
+                <Button variant="contained" type="submit">
+                  {endTitle}
+                </Button>
+              </DialogActions>
+            )}
+          </BootstrapDialog>
+        </div>
+      )}
     </div>
   );
 }

@@ -31,7 +31,7 @@ import EditEmployee from "../Modals/EditEmployee";
 import CreateEmployee from "../Modals/CreateEmployee";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import CircularProgress from "@mui/material/CircularProgress";
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -119,7 +119,7 @@ function EnhancedTableHead(props) {
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
-            sx={{ fontWeight: '700' }}
+            sx={{ fontWeight: "700" }}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -219,6 +219,7 @@ export default function EnhancedTable() {
   const [openCreateEmpModal, setOpenCreateEmpModal] = useState(false);
   const [openMonthModal, setOpenMonthModal] = useState(false);
   const [rerenderComponent, setRerenderComponent] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [employeeForModal, setEmployeeForModal] = useState({
     name: "",
     email: "",
@@ -234,9 +235,11 @@ export default function EnhancedTable() {
       let URL = `https://employee-data-api.onrender.com/api/employees`;
       let data = await fetch(URL);
       let parsedData = await data.json();
-      setAllEmployee((parsedData.data).reverse());
+      await setAllEmployee(parsedData.data.reverse());
+      setLoading(false);
     }
     fetchData();
+
     //eslint-disable-next-line
   }, [rerenderComponent]);
 
@@ -315,7 +318,7 @@ export default function EnhancedTable() {
       base_salary: 0,
       date_of_joining: new Date(),
       bank_details: { acc_no: 0, name: "", IFSC_code: 0 },
-      ...employeeObj
+      ...employeeObj,
     });
     setOpenEditEmpModal(!openEditEmpModal);
   };
@@ -424,8 +427,7 @@ export default function EnhancedTable() {
           });
           setRerenderComponent(!rerenderComponent);
           closeModal();
-        }
-        else {
+        } else {
           toast.error(data.error, {
             position: "top-center",
             autoClose: 3000,
@@ -467,9 +469,15 @@ export default function EnhancedTable() {
       {openMonthModal && (
         <Modal
           title="Select Month for Salary"
-          children={<Month employee={employeeForModal} />}
+          children={
+            <Month
+              employee={employeeForModal}
+              onClose={closeModal}
+              showmodal={openMonthModal}
+            />
+          }
           onClose={closeModal}
-          showModal={openMonthModal}
+          showmodal={openMonthModal}
           maxWidth="xs"
         />
       )}
@@ -485,7 +493,7 @@ export default function EnhancedTable() {
             />
           }
           onClose={closeModal}
-          showModal={openEditEmpModal}
+          showmodal={openEditEmpModal}
           hasfooter={"true"}
         />
       )}
@@ -501,14 +509,17 @@ export default function EnhancedTable() {
             />
           }
           onClose={closeModal}
-          showModal={openCreateEmpModal}
+          showmodal={openCreateEmpModal}
           hasfooter={"true"}
         />
       )}
 
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
-          <EnhancedTableToolbar numSelected={selected.length} handleCreateEmployee={handleCreateEmployee} />
+          <EnhancedTableToolbar
+            numSelected={selected.length}
+            handleCreateEmployee={handleCreateEmployee}
+          />
           <TableContainer>
             <Table
               sx={{ minWidth: 750 }}
@@ -593,6 +604,11 @@ export default function EnhancedTable() {
               </TableBody>
             </Table>
           </TableContainer>
+          {loading && (
+            <div className="flex justify-center mt-5">
+              <CircularProgress />
+            </div>
+          )}
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"

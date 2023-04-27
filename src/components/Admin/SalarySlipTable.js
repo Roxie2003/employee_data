@@ -28,7 +28,7 @@ import { GrView } from "react-icons/gr";
 import Invoice from "../Modals/Invoice";
 import { useNavigate } from "react-router-dom";
 import { LocalContext } from "../Auth/Context";
-
+import CircularProgress from "@mui/material/CircularProgress";
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -116,7 +116,7 @@ function EnhancedTableHead(props) {
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
-            sx={{ fontWeight: '700' }}
+            sx={{ fontWeight: "700" }}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
@@ -216,6 +216,8 @@ export default function EnhancedTable() {
   const [allEmployee, setAllEmployee] = useState([]);
   const [showSalarySlip, setShowSalarySlip] = useState(false);
   const [salarySlipDetails, setSalarySlipDetails] = useState({});
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -231,7 +233,8 @@ export default function EnhancedTable() {
       let URL = `https://employee-data-api.onrender.com/api/salarySlips/`;
       let data = await fetch(URL);
       let parsedData = await data.json();
-      setAllEmployee((parsedData.data).reverse());
+      await setAllEmployee(parsedData.data.reverse());
+      setLoading(false);
     }
     fetchData();
     //eslint-disable-next-line
@@ -303,7 +306,7 @@ export default function EnhancedTable() {
   const handleDeleteSalarySlip = (salarySlipObj) => {
     fetch(
       "https://employee-data-api.onrender.com/api/salarySlips/" +
-      salarySlipObj._id,
+        salarySlipObj._id,
       {
         method: "DELETE",
       }
@@ -432,6 +435,11 @@ export default function EnhancedTable() {
               </TableBody>
             </Table>
           </TableContainer>
+          {loading && (
+            <div className="flex justify-center mt-5">
+              <CircularProgress />
+            </div>
+          )}
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
@@ -442,6 +450,7 @@ export default function EnhancedTable() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Paper>
+
         <FormControlLabel
           control={<Switch checked={dense} onChange={handleChangeDense} />}
           label="Dense padding"

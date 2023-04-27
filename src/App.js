@@ -12,6 +12,8 @@ import UserPassword from "./components/User/UserPassword";
 import GenerateSalarySlip from "./components/Admin/GenerateSalarySlip";
 import { LocalProvider } from "./components/Auth/Context";
 import AllAdmin from "./components/Admin/AllAdmin";
+import EditSalarySlip from "./components/Admin/EditSalarySlip";
+
 function App() {
   return (
     <>
@@ -35,7 +37,7 @@ function App() {
           ></Route>
           <Route path="/allAdmin" element={<AllAdmin />}></Route>
           <Route path="/addAdmin" element={<AddAdmin />}></Route>
-          <Route path="/paySlip" element={<PaySlip />}></Route>
+          <Route path="/editSalarySlip" element={<EditSalarySlip />}></Route>
           <Route path="/salarySlip" element={<SalarySlipTable />}></Route>
         </Routes>
       </LocalProvider>

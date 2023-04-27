@@ -180,9 +180,8 @@ function Invoice({ salarySlipDetails, handleOnClose }) {
                         Total Earning
                       </th>
                       <th className="border-2 border-b-0 border-black">
-                        {salarySlipDetails.base_salary +
-                          salarySlipDetails.overtime_pay +
-                          " "}
+                        {parseInt(salarySlipDetails.base_salary) +
+                          parseInt(salarySlipDetails.overtime_pay)}
                       </th>
                       <th className="border-2 border-black">Total Deduction</th>
                       <th className="border-2 border-r-0 border-black">
@@ -215,10 +214,12 @@ function Invoice({ salarySlipDetails, handleOnClose }) {
               className="bg-red-500 text-[#ffffff] px-3 py-1 rounded-lg "
               onClick={() => {
                 document.getElementById("noprint").style.display = "none";
-                document.getElementById("closeModelIcon").style.display = "none";
+                document.getElementById("closeModelIcon").style.display =
+                  "none";
                 window.print();
                 document.getElementById("noprint").style.display = "block";
-                document.getElementById("closeModelIcon").style.display = "block";
+                document.getElementById("closeModelIcon").style.display =
+                  "block";
               }}
             >
               Print
