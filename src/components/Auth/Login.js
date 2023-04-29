@@ -18,6 +18,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jwt_decode from "jwt-decode";
 import { LocalContext } from "./Context";
+import { useFormik } from 'formik';
+import { loginSchema } from "../../schemas";
 
 function Copyright(props) {
   return (
@@ -41,9 +43,6 @@ const theme = createTheme();
 
 export default function Login() {
   const navigate = useNavigate();
-  const [loginType, setLoginType] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   // eslint-disable-next-line
   const [gAuthUser, setGAuthUser] = useState(null);
   // eslint-disable-next-line
@@ -60,20 +59,11 @@ export default function Login() {
     }
     // eslint-disable-next-line
   }, []);
-  const handleChange = (e) => {
-    if (e.target.name === "loginType") {
-      setLoginType(e.target.value);
-    } else if (e.target.name === "email") {
-      setEmail(e.target.value);
-    } else if (e.target.name === "password") {
-      setPassword(e.target.value);
-    }
-  };
 
   const handelGAuth = (userObject) => {
     try {
       fetch(
-        `https://employee-data-api.onrender.com/api/${loginType}/login/gauth/`,
+        `https://employee-data-api.onrender.com/api/${values.loginType}/login/gauth/`,
         {
           headers: {
             Accept: "application/json",
@@ -92,7 +82,7 @@ export default function Login() {
         })
         .then(function (data) {
           if (data.sucess) {
-            if (loginType === "admin") {
+            if (values.loginType === "admin") {
               localStorage.setItem(
                 "user",
                 JSON.stringify({
@@ -132,8 +122,78 @@ export default function Login() {
     }
   };
 
+  const initialValues = {
+    loginType: "",
+    email: "",
+    password: "",
+  }
+
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit } = useFormik({
+    initialValues: initialValues,
+    validationSchema: loginSchema,
+    onSubmit: (values) => {
+      try {
+        fetch(`https://employee-data-api.onrender.com/api/${values.loginType}/login`, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+
+          // Fields that to be updated are passed
+          body: JSON.stringify({
+            email: values.email,
+            password: values.password,
+          }),
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            if (data.sucess) {
+              if (values.loginType === "admin") {
+                localStorage.setItem(
+                  "user",
+                  JSON.stringify({
+                    token: data.token,
+                    email: data.email,
+                    admin: true,
+                  })
+                );
+                setUser(JSON.parse(localStorage.getItem("user")));
+                navigate("/dashboard");
+              } else {
+                localStorage.setItem(
+                  "user",
+                  JSON.stringify({
+                    token: data.token,
+                    email: data.email,
+                    employee: true,
+                  })
+                );
+                setUser(JSON.parse(localStorage.getItem("user")));
+                navigate("/");
+              }
+            } else {
+              toast.error(data.error, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+            }
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  })
+
   const handleCallbackResponse = (response) => {
-    if (loginType.length > 0) {
+    if ((values.loginType).length > 0) {
       let userObject = jwt_decode(response.credential);
       setGAuthUser(userObject);
       handelGAuth(userObject);
@@ -169,68 +229,7 @@ export default function Login() {
     google.accounts.id.prompt();
 
     //eslint-disable-next-line
-  }, [loginType]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    try {
-      fetch(`https://employee-data-api.onrender.com/api/${loginType}/login`, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-
-        // Fields that to be updated are passed
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          if (data.sucess) {
-            if (loginType === "admin") {
-              localStorage.setItem(
-                "user",
-                JSON.stringify({
-                  token: data.token,
-                  email: data.email,
-                  admin: true,
-                })
-              );
-              setUser(JSON.parse(localStorage.getItem("user")));
-              navigate("/dashboard");
-            } else {
-              localStorage.setItem(
-                "user",
-                JSON.stringify({
-                  token: data.token,
-                  email: data.email,
-                  employee: true,
-                })
-              );
-              setUser(JSON.parse(localStorage.getItem("user")));
-              navigate("/");
-            }
-          } else {
-            toast.error(data.error, {
-              position: "top-center",
-              autoClose: 3000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          }
-        });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  }, [values.loginType]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -264,6 +263,7 @@ export default function Login() {
           </Typography>
           <Box
             component="form"
+            noValidate
             onSubmit={handleSubmit}
             sx={{ mt: 1 }}
           >
@@ -275,12 +275,14 @@ export default function Login() {
               label="Login Type"
               name="loginType"
               autoFocus
-              value={loginType}
+              value={values.loginType}
               onChange={handleChange}
+              onBlur={handleBlur}
             >
               <MenuItem value={"admin"}>Admin</MenuItem>
               <MenuItem value={"employees"}>Employee</MenuItem>
             </Select>
+            {errors.loginType && touched.loginType ? (<p className="text-red-600 text-sm">{errors.loginType}</p>) : null}
             <TextField
               margin="normal"
               required
@@ -289,9 +291,11 @@ export default function Login() {
               label="Email Address"
               name="email"
               autoComplete="email"
-              value={email}
+              value={values.email}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
+            {errors.email && touched.email ? (<p className="text-red-600 text-sm">{errors.email}</p>) : null}
             <TextField
               margin="normal"
               required
@@ -300,10 +304,12 @@ export default function Login() {
               label="Password"
               type="password"
               id="password"
-              autoComplete="current-password"
-              value={password}
+              autoComplete="password"
+              value={values.password}
               onChange={handleChange}
+              onBlur={handleBlur}
             />
+            {errors.password && touched.password ? (<p className="text-red-600 text-sm">{errors.password}</p>) : null}
             <Button
               type="submit"
               fullWidth

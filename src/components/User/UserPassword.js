@@ -7,6 +7,9 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { LocalContext } from "../Auth/Context";
+import { useFormik } from 'formik';
+import { resetPasswordSchema } from "../../schemas";
+
 export default function UserPassword() {
   const navigate = useNavigate();
   // eslint-disable-next-line
@@ -15,10 +18,51 @@ export default function UserPassword() {
     id: "",
     name: "",
     email: "",
+  });
+  const initialValues = {
     current_password: "",
     new_password: "",
     confirm_password: "",
-  });
+  }
+
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit } = useFormik({
+    initialValues: initialValues,
+    validationSchema: resetPasswordSchema,
+    onSubmit: (values) => {
+      fetch(
+        "https://employee-data-api.onrender.com/api/employees/changePassword/" +
+        employeePasses._id,
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "PATCH",
+
+          // Fields that to be updated are passed
+          body: JSON.stringify(values),
+        }
+      )
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          toast.success("Password Updated Sucessfully!", {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          setTimeout(() => {
+            navigate("/");
+          }, 2000);
+        });
+    }
+  })
+
 
   useEffect(() => {
     try {
@@ -45,131 +89,79 @@ export default function UserPassword() {
     //eslint-disable-next-line
   }, []);
 
-  const handleChange = (e) => {
-    setEmployeePasses({
-      ...employeePasses,
-      [e.target.id]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (employeePasses.new_password === employeePasses.confirm_password) {
-      fetch(
-        "https://employee-data-api.onrender.com/api/employees/changePassword/" +
-        employeePasses._id,
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          method: "PATCH",
-
-          // Fields that to be updated are passed
-          body: JSON.stringify(employeePasses),
-        }
-      )
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          toast.success("Password Updated Sucessfully!", {
-            position: "top-center",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-          setTimeout(() => {
-            navigate("/");
-          }, 2000);
-        });
-    }
-    else{
-      toast.error("Password did not match!", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  };
-
-  return (
-    <div className="flex justify-center mt-8">
-      <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-      <Box
-        component="form"
-        autoComplete="off"
-        maxWidth="lg"
-        className=""
-        onSubmit={handleSubmit}
-      >
-        <h3 className="m-1 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
-          Change Password
-        </h3>
-        <Grid
-          container
-          padding={3}
-          spacing={4}
-          columns={{ xs: 2, sm: 6, md: 12 }}
+    return (
+      <div className="flex justify-center mt-8">
+        <ToastContainer
+          position="top-center"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+        <Box
+          component="form"
+          autoComplete="off"
+          maxWidth="lg"
+          className=""
+          onSubmit={handleSubmit}
         >
-          <Grid item xs={2} sm={6} md={12}>
-            <TextField
-              required
-              id="current_password"
-              label="Current Password"
-              value={employeePasses.current_password}
-              variant="standard"
-              onChange={handleChange}
-              fullWidth
-            />
+          <h3 className="m-1 p-2 bg-[#5cb85c] rounded-lg text-white font-bold">
+            Change Password
+          </h3>
+          <Grid
+            container
+            padding={3}
+            spacing={4}
+            columns={{ xs: 2, sm: 6, md: 12 }}
+          >
+            <Grid item xs={2} sm={6} md={12}>
+              <TextField
+                id="current_password"
+                label="Current Password"
+                value={values.current_password}
+                variant="standard"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                fullWidth
+              />
+              {errors.current_password && touched.current_password ? (<p className="text-red-600 text-sm">{errors.current_password}</p>) : null}
+            </Grid>
+            <Grid item xs={2} sm={6} md={12}>
+              <TextField
+                id="new_password"
+                label="New Password"
+                value={values.new_password}
+                variant="standard"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                fullWidth
+              />
+              {errors.new_password && touched.new_password ? (<p className="text-red-600 text-sm">{errors.new_password}</p>) : null}
+            </Grid>
+            <Grid item xs={2} sm={6} md={12}>
+              <TextField
+                id="confirm_password"
+                label="Confirm Password"
+                value={values.confirm_password}
+                variant="standard"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                fullWidth
+              />
+              {errors.confirm_password && touched.confirm_password ? (<p className="text-red-600 text-sm">{errors.confirm_password}</p>) : null}
+            </Grid>
           </Grid>
-          <Grid item xs={2} sm={6} md={12}>
-            <TextField
-              required
-              id="new_password"
-              label="New Password"
-              value={employeePasses.new_password}
-              variant="standard"
-              onChange={handleChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={2} sm={6} md={12}>
-            <TextField
-              required
-              id="confirm_password"
-              label="Confirm Password"
-              value={employeePasses.confirm_password}
-              variant="standard"
-              onChange={handleChange}
-              fullWidth
-            />
-          </Grid>
-        </Grid>
 
-        <div className="flex justify-center my-2">
-          <Button variant="contained" type="submit">
-            Save changes
-          </Button>
-        </div>
-      </Box>
-    </div>
-  );
-}
+          <div className="flex justify-center my-2">
+            <Button variant="contained" type="submit">
+              Save changes
+            </Button>
+          </div>
+        </Box>
+      </div>
+    );
+  }

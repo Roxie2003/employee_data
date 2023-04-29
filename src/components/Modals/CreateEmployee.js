@@ -39,6 +39,7 @@ function CreateEmployee({ employee, onFieldChange }) {
         <Grid item xs={2} sm={6} md={12}>
           <TextField
             required
+            type="email"
             id="email"
             label="Email"
             value={employee.email}

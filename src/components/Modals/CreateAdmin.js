@@ -29,6 +29,7 @@ function CreateAdmin({ admin, onFieldChange }) {
         <Grid item xs={2} sm={6} md={6}>
           <TextField
             required
+            type="email"
             id="email"
             label="Email"
             value={admin.email}

@@ -211,6 +211,7 @@ GenerateSalarySlipToolbar.propTypes = {
 
 export default function GenerateSalarySlip() {
   const [rows, setRows] = useState([]);
+  // eslint-disable-next-line
   const [user, setUser] = useContext(LocalContext);
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");

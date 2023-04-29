@@ -1,30 +1,12 @@
 import React, { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
 import Invoice from "../Modals/Invoice";
-import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import Modal from "../Modal";
 
 function EditSalarySlip({ employee, month_year, onClose, showmodal }) {
-  const navigate = useNavigate();
   const [salarySlipDetails, setSalarySlipDetails] = useState({});
   const [showSalarySlip, setShowSalarySlip] = useState(false);
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
   const salarySlipExists = async (employee) => {
     let URL =
       `https://employee-data-api.onrender.com/api/salarySlips/` +
@@ -127,6 +109,7 @@ function EditSalarySlip({ employee, month_year, onClose, showmodal }) {
   useEffect(() => {
     console.log("Hiii");
     salarySlipExists(employee);
+    // eslint-disable-next-line
   }, []);
 
   return (

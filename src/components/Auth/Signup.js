@@ -15,6 +15,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import jwt_decode from "jwt-decode";
 import { LocalContext } from "./Context";
+import { useFormik } from 'formik';
+import { signupSchema } from "../../schemas";
 
 function Copyright(props) {
   return (
@@ -40,11 +42,67 @@ export default function Signup() {
   const navigate = useNavigate();
   // eslint-disable-next-line
   const [user, setUser] = useContext(LocalContext);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [gAuthUser, setGAuthUser] = useState(null);
+
+  const initialValues = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  }
+
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit } = useFormik({
+    initialValues: initialValues,
+    validationSchema: signupSchema,
+    onSubmit: (values) => {
+      try {
+        fetch("https://employee-data-api.onrender.com/api/employees/", {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+  
+          // Fields that to be updated are passed
+          body: JSON.stringify({
+            name: values.firstName + " " + values.lastName,
+            email: values.email,
+            password: values.password,
+          }),
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            if (data.sucess) {
+              localStorage.setItem(
+                "user",
+                JSON.stringify({
+                  token: data.token,
+                  email: data.email,
+                  employee: true,
+                })
+              );
+              setUser(JSON.parse(localStorage.getItem("user")));
+  
+              navigate("/");
+            } else {
+              toast.error(data.error, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+            }
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  })
 
   const handleCallbackResponse = (response) => {
     let userObject = jwt_decode(response.credential);
@@ -118,68 +176,6 @@ export default function Signup() {
     //eslint-disable-next-line
   }, [gAuthUser]);
 
-  const handleChange = (e) => {
-    if (e.target.name === "firstName") {
-      setFirstName(e.target.value);
-    } else if (e.target.name === "lastName") {
-      setLastName(e.target.value);
-    } else if (e.target.name === "email") {
-      setEmail(e.target.value);
-    } else if (e.target.name === "password") {
-      setPassword(e.target.value);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    try {
-      fetch("https://employee-data-api.onrender.com/api/employees/", {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-
-        // Fields that to be updated are passed
-        body: JSON.stringify({
-          name: firstName + " " + lastName,
-          email,
-          password,
-        }),
-      })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          if (data.sucess) {
-            localStorage.setItem(
-              "user",
-              JSON.stringify({
-                token: data.token,
-                email: data.email,
-                employee: true,
-              })
-            );
-            setUser(JSON.parse(localStorage.getItem("user")));
-
-            navigate("/");
-          } else {
-            toast.error(data.error, {
-              position: "top-center",
-              autoClose: 3000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          }
-        });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <ToastContainer
@@ -211,6 +207,7 @@ export default function Signup() {
           </Typography>
           <Box
             component="form"
+            noValidate
             onSubmit={handleSubmit}
             sx={{ mt: 3 }}
           >
@@ -222,35 +219,41 @@ export default function Signup() {
                   required
                   fullWidth
                   id="firstName"
-                  value={firstName}
+                  value={values.firstName}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   label="First Name"
                   autoFocus
                 />
+                {errors.firstName && touched.firstName ? (<p className="text-red-600 text-sm">{errors.firstName}</p>) : null}
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
                   fullWidth
                   id="lastName"
-                  value={lastName}
+                  value={values.lastName}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   label="Last Name"
                   name="lastName"
                   autoComplete="family-name"
                 />
+                {errors.lastName && touched.lastName ? (<p className="text-red-600 text-sm">{errors.lastName}</p>) : null}
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
                   id="email"
-                  value={email}
+                  value={values.email}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   label="Email Address"
                   name="email"
                   autoComplete="email"
                 />
+                {errors.email && touched.email ? (<p className="text-red-600 text-sm">{errors.email}</p>) : null}
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -260,10 +263,12 @@ export default function Signup() {
                   label="Password"
                   type="password"
                   id="password"
-                  value={password}
+                  value={values.password}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   autoComplete="new-password"
                 />
+                {errors.password && touched.password ? (<p className="text-red-600 text-sm">{errors.password}</p>) : null}
               </Grid>
             </Grid>
             <Button
