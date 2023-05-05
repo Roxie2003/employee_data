@@ -210,26 +210,26 @@ export default function Login() {
     }
   };
 
-  useEffect(() => {
-    // / * global google */
-    //eslint-disable-next-line
-    google.accounts.id.initialize({
-      client_id:
-        "289036486479-pplpa2filjtri6v1efqn7s51818l0nls.apps.googleusercontent.com",
-      callback: handleCallbackResponse,
-    });
+  // useEffect(() => {
+  //   // / * global google */
+  //   //eslint-disable-next-line
+  //   google.accounts.id.initialize({
+  //     client_id:
+  //       "289036486479-pplpa2filjtri6v1efqn7s51818l0nls.apps.googleusercontent.com",
+  //     callback: handleCallbackResponse,
+  //   });
 
-    //eslint-disable-next-line
-    google.accounts.id.renderButton(document.getElementById("googleAuthDiv"), {
-      theme: "outline",
-      size: "large",
-    });
+  //   //eslint-disable-next-line
+  //   google.accounts.id.renderButton(document.getElementById("googleAuthDiv"), {
+  //     theme: "outline",
+  //     size: "large",
+  //   });
 
-    //eslint-disable-next-line
-    google.accounts.id.prompt();
+  //   //eslint-disable-next-line
+  //   google.accounts.id.prompt();
 
-    //eslint-disable-next-line
-  }, [values.loginType]);
+  //   //eslint-disable-next-line
+  // }, [values.loginType]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -333,11 +333,11 @@ export default function Login() {
           </Box>
         </Box>
 
-        <div className="my-6 flex items-center">
+        {/* <div className="my-6 flex items-center">
           <div className="flex-grow bg bg-gray-300 h-0.5"></div>
           <div className="flex-grow-0 mx-5">or continue with Google</div>
           <div className="flex-grow bg bg-gray-300 h-0.5"></div>
-        </div>
+        </div> */}
 
         <center>
           <div id="googleAuthDiv" className="w-[80vw] md:w-[20vw]"></div>

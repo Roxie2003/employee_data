@@ -18,15 +18,6 @@ function EditSalarySlip({ employee, month_year, onClose, showmodal }) {
     let parsedData = await data.json();
     //check if already generated
     if (parsedData.data) {
-      toast.success("Salary Slip Already Exist!", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
       await setSalarySlipDetails(parsedData.data);
       setShowSalarySlip(true);
     } else {
@@ -47,7 +38,7 @@ function EditSalarySlip({ employee, month_year, onClose, showmodal }) {
       };
       salarySlip = await {
         ...salarySlip,
-        total_salary: salarySlip["base_salary"] + salarySlip["overtime_pay"],
+        total_salary: salarySlip["base_salary"] ? salarySlip["base_salary"] : 0 + salarySlip["overtime_pay"],
       };
       await setSalarySlipDetails(salarySlip);
     }
@@ -73,8 +64,8 @@ function EditSalarySlip({ employee, month_year, onClose, showmodal }) {
     e.preventDefault();
     fetch(
       "https://employee-data-api.onrender.com/api/salarySlips/" +
-        salarySlipDetails.employee_id +
-        "/",
+      salarySlipDetails.employee_id +
+      "/",
       {
         headers: {
           Accept: "application/json",
@@ -116,12 +107,12 @@ function EditSalarySlip({ employee, month_year, onClose, showmodal }) {
     <div align="center">
       <div>
         {showSalarySlip && salarySlipDetails && (
-          <Invoice
-            salarySlipDetails={salarySlipDetails}
-            handleOnClose={() => {
-              onClose();
-            }}
-          ></Invoice>
+            <Invoice
+              salarySlipDetails={salarySlipDetails}
+              handleOnClose={() => {
+                onClose();
+              }}
+            ></Invoice>
         )}
       </div>
       {!showSalarySlip &&

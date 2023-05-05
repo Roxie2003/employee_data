@@ -508,7 +508,11 @@ export default function GenerateSalarySlip() {
                                   handleGenerateButton(e, row.actionObject)
                                 }
                               >
-                                Generate
+                                {
+                                  (row.actionObject.attendance).find(e => e.month_year === (months[selectedMonth] + '-' + selectedYear))
+                                    ? 'Preview'
+                                    : 'Generate'
+                                }
                               </Button>
                             </div>
                           </TableCell>
